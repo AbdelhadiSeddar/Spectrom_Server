@@ -1,0 +1,8 @@
+{
+    "C_Cpp.errorSquiggles": "Disabled",
+    "editor.cursorStyle": "underline",
+    "files.autoGuessEncoding": true,
+    "editor.unicodeHighlight.ambiguousCharacters": true,
+    "scm.defaultViewSortKey": "path",
+    "explorer.sortOrder": "type"
+}
