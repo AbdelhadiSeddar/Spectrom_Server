@@ -1,38 +1,41 @@
 #ifndef CLT_DEFS_H
 #include <pthread.h>
+#include "server/inis.h"
 #define CLT_DEFS_H
+
+typedef struct client_info clt_inf;
 typedef struct client_links* clt_lnk;
 typedef struct client clt;
 
 
-struct client
-{
-    int index;
-    char UUID[37];
+struct client_info{
+    pthread_t thread_id;
+    int sock;
     int ID;
+    char GUID[37];
+    struct sockaddr_in addr;
 };
 struct client_links
 {
     clt_lnk prev;
-    pthread_t thread_id;
-    struct sockaddr address;
-    int sock;
-    clt Client;
+    int INDEX;
+    clt_inf Client;
     clt_lnk next;
 };
 
-extern clt_lnk CLT_LIST;
-extern clt_lnk NULL_CLIENT;
-extern clt_lnk CURRENT_CLIENT;
-extern int CURRENT_INDEX;
-extern int INIS;
+clt_lnk CLT_LIST = NULL;
+clt_lnk NULL_CLIENT = NULL;
+clt CLIENT;
+clt_lnk CURRENT_CLIENT = NULL;
+int CURRENT_INDEX = -1;
+int INIS = 0;
 
 //Initialises the 
 //Clients linked List
 //Return :
 // 0 -> Success
 // -1-> Failure
-extern int clt_inis(clt_lnk NULL_client);
+extern int clt_inis();/**/
 
 //Add a Client
 //Returns:
