@@ -1,12 +1,13 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <netdb.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
-#include "client/clt_defs.h"
-#include "misc.h"
+#include "../client/clt_defs.h"
+#include "../misc.h"
 // To be fixed
 /*
 char* GETIP(){
@@ -24,8 +25,8 @@ char* GETIP(){
 
 void clt_handling(clt_lnk client){
     char GUID[37];
-    if(recv((client -> sock), (client ->Client.UUID), 37, NULL) < 0){
-        teprintf("UUID not recived");
+    if(recv((client -> Client.sock), (client ->Client.GUID), 37, 0) < 0){
+        printf("UUID not recived");
         exit(1);
     }
     //Do wat you want

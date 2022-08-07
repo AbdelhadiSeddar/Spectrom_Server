@@ -7,10 +7,11 @@
 pthread_t _COMMAND_THREAD_ID;
 
 
-extern void srvr_load();
-extern void* srvr_cmd(void* _args);
-extern void srvr_listen(int server_sock);
+extern void srvr_load(int argc, char *argv[]);
+extern void srvr_listen(int server_sock, int argc, char *argv[]);
 
+//Thread Functions
+extern void* srvr_cmd(void* _args);
 extern void* srvr_clt_handling(void* clt);
 
 #endif

@@ -9,7 +9,7 @@
 
 #include "server/inis.h"
 
-int main () {
-    srvr_load();
+int main (int argc, char *argv[]) {
+    srvr_load(argc, argv);
     return 0;
 }
