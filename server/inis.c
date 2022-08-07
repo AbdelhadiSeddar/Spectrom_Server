@@ -15,6 +15,7 @@
 #define PATH_TO_STORE_CLIENTS "/mnt/c/clients/"
 #define MAX_THREADS 150
 void srvr_load(int argc, char *argv[]){
+    
     FILE* f; 
     printf("Declaring Locals\n");
     int server_sock;
@@ -46,7 +47,8 @@ void srvr_load(int argc, char *argv[]){
     printf("Binded\n");
     sleep(1);
 
-    char path[] = "/mnt/c/.TCP/here";
+    char path[] = "/mnt/d/Files/.TCP/here";
+    
     f = fopen(path, "a");
     fclose(f);
     printf("Setting the Socket (%d) as listen with 100 MAX oon Queue\n", server_sock);
@@ -68,8 +70,9 @@ void srvr_listen(int server_sock, int argc, char *argv[]){
     int error = 0;
     int clts = 0;
     re: ;
-    struct thread_info *tinf = calloc(MAX_THREADS, sizeof(tinf));
+    struct thread_info* tinf; 
     for(;;){
+        tinf = malloc(sizeof(tinf));
         tinf -> thread_num = clts + 1;
         tinf -> argv_string = argv[optind + clts];
         client = malloc(sizeof(client));
@@ -83,7 +86,6 @@ void srvr_listen(int server_sock, int argc, char *argv[]){
         }
         printf("here\n");
         pthread_create(&(tinf -> thread_id), NULL, srvr_clt_handling, (void *)client);
-        tinf++;
         clts++;
         if(clts == 5)
             debug_clt_list();
