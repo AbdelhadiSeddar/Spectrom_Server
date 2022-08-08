@@ -1,24 +1,20 @@
 #ifndef CLT_DEFS_H
 #include <pthread.h>
 #include <stdlib.h>
+#define PATH_TO_STORE_CLIENTS "/mnt/c/clients/"
+#define MAX_THREADS 150
 #define CLT_DEFS_H
 
 typedef struct client_info clt_inf;
 typedef struct client_links* clt_lnk;
 typedef struct client_links clt;
 
-struct thread_info {    
-    pthread_t thread_id;        
-    int       thread_num;       
-    char      *argv_string;      
-};
-
 struct client_info{
-    pthread_t           thread_id;
+    pthread_t*          thread_id;
     int                 sock;
     int                 ID;
     char                GUID[37];
-    struct sockaddr_in  *addr;
+    struct sockaddr_in* addr;
 };
 struct client_links
 {
@@ -31,7 +27,6 @@ struct client_links
 extern clt_lnk  CLT_LIST;
 extern clt_lnk  NULL_CLIENT; 
 extern clt_lnk  CURRENT_CLIENT;
-extern clt      SAMPLECLIENT;
 extern int      CURRENT_INDEX;
 extern int      INIS;
 

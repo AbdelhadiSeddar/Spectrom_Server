@@ -12,8 +12,7 @@
 #include "../client/clt_defs.h"
 #include "../debug/debug.h"
 
-#define PATH_TO_STORE_CLIENTS "/mnt/c/clients/"
-#define MAX_THREADS 150
+
 void srvr_load(int argc, char *argv[]){
     
     FILE* f; 
@@ -70,12 +69,11 @@ void srvr_listen(int server_sock, int argc, char *argv[]){
     int error = 0;
     int clts = 0;
     re: ;
-    struct thread_info* tinf; 
+
     for(;;){
-        tinf = malloc(sizeof(tinf));
-        tinf -> thread_num = clts + 1;
-        tinf -> argv_string = argv[optind + clts];
         client = malloc(sizeof(client));
+        (client -> Client.thread_id) = malloc(sizeof((client -> Client.thread_id)));
+        (client -> Client.addr) = malloc(sizeof((client -> Client.addr)));
         if((client->Client.sock = accept(server_sock, (struct sockaddr *) &(client->Client.addr), &client_size)) < 0){
             perror("Accept() ");
             if(error < 20){
@@ -85,7 +83,7 @@ void srvr_listen(int server_sock, int argc, char *argv[]){
                 exit(1);
         }
         printf("here\n");
-        pthread_create(&(tinf -> thread_id), NULL, srvr_clt_handling, (void *)client);
+        pthread_create((client -> Client.thread_id), NULL, srvr_clt_handling, &client);
         clts++;
         if(clts == 5)
             debug_clt_list();
@@ -96,7 +94,11 @@ void* srvr_cmd(void* _args){
 }
 
 void* srvr_clt_handling(void* clt){
-        printf("here\n");
+    char path_[] = "/mnt/d/Files/.TCP/handled";
+    
+    FILE* f = fopen(path_, "a");
+    fclose(f);
+
     clt_lnk client = *(clt_lnk*)clt;
     char path[53]; 
         printf("here\n");
@@ -121,6 +123,6 @@ void* srvr_clt_handling(void* clt){
     fclose(fl);
     send(client->Client.sock, "LLL", sizeof("LLL"),0);
     close(client->Client.sock);
-    close(client->Client.thread_id);
+    close(*(client->Client.thread_id));
     return NULL;
 }
