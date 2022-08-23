@@ -15,7 +15,6 @@
 
 void srvr_load(int argc, char *argv[]){
     
-    FILE* f; 
     printf("Declaring Locals\n");
     int server_sock;
     struct sockaddr_in server_addr;
@@ -46,10 +45,6 @@ void srvr_load(int argc, char *argv[]){
     printf("Binded\n");
     sleep(1);
 
-    char path[] = "/mnt/d/Files/.TCP/here";
-    
-    f = fopen(path, "a");
-    fclose(f);
     printf("Setting the Socket (%d) as listen with 100 MAX oon Queue\n", server_sock);
     sleep(1);
     if(listen(server_sock, 100) < 0){
@@ -74,7 +69,7 @@ void srvr_listen(int server_sock, int argc, char *argv[]){
         client = malloc(sizeof(client));
         (client -> Client.thread_id) = malloc(sizeof((client -> Client.thread_id)));
         (client -> Client.addr) = malloc(sizeof((client -> Client.addr)));
-        if((client->Client.sock = accept(server_sock, (struct sockaddr *) &(client->Client.addr), &client_size)) < 0){
+        if((client-> Client.sock = accept(server_sock, (struct sockaddr *) &(client->Client.addr), &client_size)) < 0){
             perror("Accept() ");
             if(error < 20){
                 error++;
@@ -82,7 +77,6 @@ void srvr_listen(int server_sock, int argc, char *argv[]){
             }else
                 exit(1);
         }
-        printf("here\n");
         pthread_create((client -> Client.thread_id), NULL, srvr_clt_handling, &client);
         clts++;
         if(clts == 5)
@@ -94,34 +88,26 @@ void* srvr_cmd(void* _args){
 }
 
 void* srvr_clt_handling(void* clt){
-    char path_[] = "/mnt/d/Files/.TCP/handled";
-    
-    FILE* f = fopen(path_, "a");
-    fclose(f);
-
     clt_lnk client = *(clt_lnk*)clt;
-    char path[53]; 
-        printf("here\n");
+    char path[53];
     strcpy(path, PATH_TO_STORE_CLIENTS);
-    if(send(client->Client.sock, "1", sizeof("1"), 0) < 0){
+    if((send(client->Client.sock, "1", sizeof("1"), 0)) < 0){
             perror("Sending Error");
             exit(1);
         }
         
     send(client->Client.sock, "00X", sizeof("00X"), 0);
     recv(client->Client.sock, client->Client.GUID,37,0);
-
-    FILE *fl;
     strcat(path, client->Client.GUID);
-    if(!(fl = fopen(path, "w"))){
+    if(!((client -> Client.file) = fopen(path, "w+"))){
         close(client->Client.sock);
         return NULL;
     }
-        printf("here\n");
 
-    fprintf(fl, "Guid:\t%s\nSocket:\t%d\nAddr:\n\tip:\t%i",client->Client.GUID, client->Client.sock,client->Client.addr -> sin_addr.s_addr);
-    fclose(fl);
-    send(client->Client.sock, "LLL", sizeof("LLL"),0);
+    fprintf((client -> Client.file), "Guid:\t%s\nSocket:\t%d\nAddr:\n\tip:\t%i",client->Client.GUID, client->Client.sock,client->Client.addr -> sin_addr.s_addr);
+    fclose((client -> Client.file));
+
+    send(client -> Client.sock, "LLL", sizeof("LLL"),0);
     close(client->Client.sock);
     close(*(client->Client.thread_id));
     return NULL;

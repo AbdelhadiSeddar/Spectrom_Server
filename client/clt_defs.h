@@ -1,8 +1,12 @@
 #ifndef CLT_DEFS_H
 #include <pthread.h>
 #include <stdlib.h>
-#define PATH_TO_STORE_CLIENTS "/mnt/c/clients/"
+#include <stdio.h>
+
+
+#define PATH_TO_STORE_CLIENTS "/mnt/d/Files/clients/"
 #define MAX_THREADS 150
+
 #define CLT_DEFS_H
 
 typedef struct client_info clt_inf;
@@ -10,6 +14,7 @@ typedef struct client_links* clt_lnk;
 typedef struct client_links clt;
 
 struct client_info{
+    FILE*               file;
     pthread_t*          thread_id;
     int                 sock;
     int                 ID;
