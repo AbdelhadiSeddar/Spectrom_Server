@@ -1,11 +1,8 @@
 #ifndef CLT_DEFS_H
+
 #include <pthread.h>
 #include <stdlib.h>
 #include <stdio.h>
-
-
-#define PATH_TO_STORE_CLIENTS "/mnt/d/Files/clients/"
-#define MAX_THREADS 150
 
 #define CLT_DEFS_H
 

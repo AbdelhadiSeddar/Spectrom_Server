@@ -10,9 +10,9 @@
 void debug_clt_list(){
     FILE *f;
 
-    f = fopen("/mnt/c/debug/clt.sout","w");
+    f = fopen("/ftp/dev/clients/clt_sout","w+");
 
-    clt_lnk clients = NULL_CLIENT;
+    clt_lnk clients = CURRENT_CLIENT;
 
     while(clients){
         fprintf(f,"Client:");
@@ -20,9 +20,10 @@ void debug_clt_list(){
         fprintf(f,"-> ID:\t%d\n", (clients->Client.ID));
         fprintf(f,"-> sock:\t%d\n", (clients->Client.sock));
         fprintf(f,"-> Index:\t%d\n", (clients-> INDEX));
+        clients = clients ->next;
     }
 
-
+    fclose(f);
 }
 
 

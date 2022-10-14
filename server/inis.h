@@ -4,7 +4,7 @@
 #include <netinet/in.h>
 #define INIS_H
 
-pthread_t _COMMAND_THREAD_ID;
+extern pthread_t _COMMAND_THREAD_ID;
 
 
 extern void srvr_load(int argc, char *argv[]);

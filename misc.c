@@ -8,13 +8,12 @@ struct tm GT() {
 
 void tprintf(char* string){
     struct tm Time = GT();
-    printf("\n[ %d-%d | %d:%d:%d ]\t", Time.tm_mon,Time.tm_mday, Time.tm_hour, Time.tm_min, Time.tm_sec);
-    printf("%s", string);
+    printf("[ %d-%d | %d:%d:%d ]\t", Time.tm_mon,Time.tm_mday, Time.tm_hour, Time.tm_min, Time.tm_sec);
+    printf("%s\n", string);
 }
 
 void teprintf(char* string){
-    struct tm Time = GT();
-    printf("\n[ %d-%d | %d:%d:%d ]\t", Time.tm_mon,Time.tm_mday, Time.tm_hour, Time.tm_min, Time.tm_sec);
+    tprintf("");
     perror(string);
 }
 
