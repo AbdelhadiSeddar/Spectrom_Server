@@ -1,8 +1,0 @@
-bin/*
-com
-run
-desktop.ini
-FByte.txt
-*.json
-here
--fno-stack-protector
