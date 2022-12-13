@@ -13,6 +13,7 @@
 #include "../main_defs.h"
 #include "../misc.h"
 #include "../client/clt_defs.h"
+#include "../client/clt_cntrl.h"
 #include "../debug/debug.h"
 
 
@@ -21,6 +22,14 @@ void srvr_load(int argc, char *argv[]){
     printf("Declaring Locals\n");
     int server_sock;
     struct sockaddr_in server_addr;
+    printf("Initializing Mutexes\n");
+
+    if (pthread_mutex_init(&CURRENT_INFO_MUTEX, NULL) != 0) {
+        perror("\n mutex init has failed\n");
+        exit(1);
+    }
+
+
     printf("Inisialising the List\n");
     clt_inis();
     printf("Inisialized\n");
@@ -64,27 +73,26 @@ void srvr_load(int argc, char *argv[]){
 
 } 
 
-void srvr_listen(int server_sock, int argc, char *argv[]){
-    clt_lnk client = NULL;    
-    clt_inf c;
+void srvr_listen(int server_sock, int argc, char *argv[]){  
+    clt_inf* TEMP;
     pthread_t cmd;
-    unsigned int client_size = sizeof(c.addr);
+    unsigned int client_size = sizeof(TEMP -> addr);
     int error = 0;
     int clts = 0;
     re: ;
     pthread_create(&cmd, NULL, srvr_cmd, NULL);
     for(;;){
-        client = malloc(sizeof(*client));
-            client -> Client.file = malloc(sizeof(*(client -> Client.file)));
-            client -> Client.thread_id = NULL;
-            client -> Client.addr = NULL;
 
-        client -> prev = CURRENT_CLIENT;
-        client -> next = NULL;
 
-        (client -> Client.thread_id) = malloc(sizeof((client -> Client.thread_id)));
-        (client -> Client.addr) = malloc(sizeof((client -> Client.addr)));
-        if(((client-> Client.sock) = accept(server_sock, (struct sockaddr *) &(client->Client.addr), &client_size)) < 0){
+        TEMP = malloc(sizeof(TEMP));
+        (TEMP -> thread_id) = NULL;
+        (TEMP -> addr ) = NULL;
+
+        (TEMP -> thread_id )= malloc(sizeof((TEMP -> thread_id)));
+        (TEMP -> addr) = malloc(sizeof((TEMP -> addr)));
+
+
+        if(((TEMP -> sock) = accept(server_sock, (struct sockaddr *) &(TEMP -> addr), &client_size)) < 0){
             perror("Accept() ");
             if(error < 20){
                 error++;
@@ -93,19 +101,19 @@ void srvr_listen(int server_sock, int argc, char *argv[]){
                 exit(1);
         }
 
-        CURRENT_CLIENT -> next = client;
-        CURRENT_CLIENT = client;
-        CURRENT_CLIENT -> INDEX = CURRENT_INDEX++;
-
-        printf("Accepted client %d, on socket %d\n", clts, (client -> Client.sock));
-        if(clts)
-            pthread_create((client -> Client.thread_id), NULL, srvr_clt_handling, &client);
-        else{
-            close( (client -> Client.sock) );
+        printf("Accepted client %d, on socket %d\n", clts, (TEMP -> sock));
+        if(clts){
+            pthread_create((TEMP -> thread_id), NULL, clt_handling, (void *) TEMP);
+        }else{
+            close( (TEMP -> sock) );
+            free(TEMP);
             clts ++;
         }
     }
 }
+
+
+
 void* srvr_cmd(void* _args){
     e:;
     char cmd[10];
@@ -114,25 +122,3 @@ void* srvr_cmd(void* _args){
     goto e;
 }
 
-void* srvr_clt_handling(void* clt){
-    clt_lnk client = *(clt_lnk*)clt;
-    char path[54];
-    strcpy(path, PATH_TO_STORE_CLIENTS);
-    
-    send((client-> Client.sock), "1", sizeof("1"), 0);
-    send((client->Client.sock), "00X", sizeof("00X"), 0);
-    recv((client->Client.sock), (client->Client.GUID),sizeof((client->Client.GUID)),0);
-    strcat(path, (client->Client.GUID));
-    if(!( (client -> Client.file) = fopen(path, "w+") ) ){
-        close(client->Client.sock);
-        perror("Write()");
-        exit(1);
-    }
-
-    fprintf((client -> Client.file), "Guid:\t%s\nSocket:\t%d\nAddr:\n", (client->Client.GUID), (client->Client.sock));
-    fclose((client -> Client.file));
-
-    send((client -> Client.sock), "LLL", sizeof("LLL"),0);
-    close((client->Client.sock));
-    return NULL;
-}

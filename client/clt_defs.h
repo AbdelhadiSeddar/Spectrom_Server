@@ -23,6 +23,7 @@ struct client_links
     clt_lnk prev;
     int     INDEX;
     clt_inf Client;
+    pthread_mutex_t MUTEX;
     clt_lnk next;
 };
 
@@ -31,6 +32,7 @@ extern clt_lnk  NULL_CLIENT;
 extern clt_lnk  CURRENT_CLIENT;
 extern int      CURRENT_INDEX;
 extern int      INIS;
+extern pthread_mutex_t CURRENT_INFO_MUTEX;
 
 //Initialises the 
 //Clients linked List
@@ -43,7 +45,7 @@ extern int clt_inis();
 //Returns:
 //INTEGER -> index
 //-1 -> Error Somewere
-extern int clt_add(int sock,const char* UUID, int ID, clt_lnk* New_Client);
+extern int clt_add(clt_inf New_Inf, clt_lnk* New_Client);
 /*
 //Check for past Connections
 // Returns:

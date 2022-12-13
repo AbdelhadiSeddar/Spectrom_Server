@@ -12,7 +12,6 @@ extern void srvr_listen(int server_sock, int argc, char *argv[]);
 
 //Thread Functions
 extern void* srvr_cmd(void* _args);
-extern void* srvr_clt_handling(void* clt);
 
 #endif
 #define PORT 9114
