@@ -1,15 +1,4 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <netdb.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-
-
-#include "clt_cmd.h"
-#include "clt_defs.h"
-#include "../misc.h"
+#include "../_Imports.h"
 
 void* clt_handling(void* client_){
     clt_inf clt = *(clt_inf*)client_;

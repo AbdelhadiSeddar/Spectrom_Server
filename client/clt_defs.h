@@ -1,18 +1,12 @@
 #ifndef CLT_DEFS_H
-
-#include <pthread.h>
-#include <stdlib.h>
-#include <stdio.h>
-
+#include "../_Imports.h"
 #define CLT_DEFS_H
-
 typedef struct client_info clt_inf;
 typedef struct client_links* clt_lnk;
 typedef struct client_links clt;
 
 struct client_info{
     FILE*               file;
-    pthread_t*          thread_id;
     int                 sock;
     int                 ID;
     char                GUID[37];
@@ -23,7 +17,6 @@ struct client_links
     clt_lnk prev;
     int     INDEX;
     clt_inf Client;
-    pthread_mutex_t MUTEX;
     clt_lnk next;
 };
 

@@ -1,7 +1,5 @@
 #ifndef INIS_H
-#include <pthread.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
+#include "../_Imports.h"
 #define INIS_H
 
 extern pthread_t _COMMAND_THREAD_ID;

@@ -1,7 +1,4 @@
 #include "clt_defs.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 pthread_mutex_t CURRENT_INFO_MUTEX;
 

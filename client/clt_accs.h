@@ -1,39 +1,37 @@
 #ifndef CLT_ACCS_H
-#include "clt_defs.h"
+
+#include "../_Imports.h"
+
 #define CLT_ACCS_H
 
 /////////////////////////////////////   Checks  /////////////////////////////////////
 
-//Check Username
-// Returns:
-// 0 -> Existant
-// 1 -> Non-existant
-// Note: You can store the username's ID in
-// the second parameter else just put NULL
+
+/// @brief Check Client's Username.
+/// @param Username 
+/// @param ID ** Return ID IF Existant
+/// @return  0 => Existant |[]| 1 => Non-Existant 
 extern int clt_check_usrnm(char* Username, int* ID);
 
-//Check Password
-// Returns:
-// -1-> Username Non-existant
-// 0 -> Correct
-// 1 -> Non-existant
+/// @brief Check  Username's password.
+/// @param Username 
+/// @param Password
+/// @return  0 => Valid |[]| 1 => Non-Valid 
 extern int clt_check_pswd(char* Username, char* Password);
 
-//Check For ID existance
-// Returns:
-// 0 -> Existant
-// 1 -> Non-existant
-// Note: You can store the ID's username in
-// the second parameter else just put NULL
+
+/// @brief Check Client's Username.
+/// @param Username ** Return The Username IF Existant
+/// @param ID
+/// @return  0 => Existant |[]| 1 => Non-Existant
 extern int clt_check_id(int ID, char* Username);
 
-//Full check on command
-// Returns:
-// -1-> Fail || Username
-// 0 -> Succes
-// 1 -> Fail || Password
-// Note: You can store the username's ID in
-// the third parameter else just put NULL
+
+/// @brief Full Check on W/ Username + Password.
+/// @param Username 
+/// @param Password
+/// @param ID ** Return ID IF Existant
+/// @return -1 => Wrong Un |[]|  0 => Existant |[]| 1 => Wrong Pw
 extern int clt_check(int sock, char* Username, char* Password, int* ID);
 
 

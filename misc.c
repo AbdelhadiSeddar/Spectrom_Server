@@ -1,5 +1,4 @@
-#include <stdio.h>
-#include <time.h>
+#include "_Imports.h"
 
 struct tm GT() {
     time_t t = time(NULL);
