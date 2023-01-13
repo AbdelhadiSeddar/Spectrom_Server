@@ -24,13 +24,24 @@ int clt_inis(){
     return 0;
 }
 
-int clt_add(clt_inf New_Inf, clt_lnk* New_Client){
+clt_lnk clt_new(clt_inf Info)
+{
+    clt_lnk re = malloc(sizeof(clt));
 
-    clt_lnk client = malloc(sizeof(*client));
+    re -> Client = Info;
 
-    (client -> Client.file) = malloc(sizeof(*(client -> Client.file)));
-    (client -> Client.thread_id) = malloc(sizeof((client -> Client.thread_id)));
-    (client -> Client.addr) = malloc(sizeof((client -> Client.addr)));
+    return re;
+}
+
+clt_inf clt_inf_new(FILE *file, int sock, int ID, char *ID, sa_in Addr)
+{
+    clt_inf re;
+    re.file = file;
+    re.sock = sock;
+}
+
+int clt_add(clt_inf New_Inf, clt_lnk New_Client){
+
     
     pthread_mutex_lock(&CURRENT_INFO_MUTEX);
 
@@ -43,5 +54,6 @@ int clt_add(clt_inf New_Inf, clt_lnk* New_Client){
 
     pthread_mutex_unlock(&CURRENT_INFO_MUTEX);
 
+    
     return 0;
 }

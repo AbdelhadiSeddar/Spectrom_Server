@@ -4,19 +4,22 @@
 typedef struct client_info clt_inf;
 typedef struct client_links* clt_lnk;
 typedef struct client_links clt;
+typedef struct sockaddr_in* sa_in;
 
-struct client_info{
+struct client_info
+{
     FILE*               file;
     int                 sock;
     int                 ID;
     char                GUID[37];
     struct sockaddr_in* addr;
 };
+
 struct client_links
 {
-    clt_lnk prev;
     int     INDEX;
-    clt_inf Client;
+    clt_inf Client; 
+    clt_lnk prev;
     clt_lnk next;
 };
 
@@ -33,6 +36,23 @@ extern pthread_mutex_t CURRENT_INFO_MUTEX;
 // 0 -> Success
 // -1-> Failure
 extern int clt_inis();
+
+/// @brief Creates new Client Structure 
+/// @param Info Client Information (See struct client_info)
+/// @return NULL : ERROR || clt_lnk : Pointer to new Client
+extern clt_lnk clt_new( clt_inf Info);
+
+/// @param Info Client Information (See struct client_info)
+
+/// @brief Creates new Client Structure 
+/// @param file 
+/// @param sock 
+/// @param ID 
+/// @param ID 
+/// @param Addr 
+/// @return clt_inf : New Client info struct
+extern clt_inf clt_inf_new(FILE* file, int sock, int ID, char* ID, sa_in Addr);
+
 
 //Add a Client
 //Returns:
