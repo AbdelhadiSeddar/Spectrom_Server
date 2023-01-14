@@ -4,8 +4,6 @@ pthread_mutex_t CURRENT_INFO_MUTEX;
 
 clt_lnk CLT_LIST = NULL;
 clt_lnk NULL_CLIENT = NULL;
-clt_lnk CURRENT_CLIENT = NULL;
-int CURRENT_INDEX = -1;
 int INIS = 0;
 
 int clt_inis()
@@ -17,9 +15,8 @@ int clt_inis()
     strcpy((NULL_CLIENT->Client.GUID), "00000000-0000-0000-0000-000000000000");
     int sock = 3;
 
-    NULL_CLIENT->next = NULL;
-    NULL_CLIENT->prev = NULL;
-    CURRENT_CLIENT = NULL_CLIENT;
+    NULL_CLIENT->left = NULL;
+    NULL_CLIENT->right = NULL;
 
     return 0;
 }
@@ -48,14 +45,67 @@ int clt_add(clt_lnk New_Client)
 
     pthread_mutex_lock(&CURRENT_INFO_MUTEX);
 
-    client->prev = CURRENT_CLIENT;
-    client->next = NULL;
-    client->INDEX = CURRENT_INDEX;
-
-    CURRENT_INDEX++;
-    CURRENT_CLIENT = client;
+    int re = clt_add_R(NULL_CLIENT, New_Client);
 
     pthread_mutex_unlock(&CURRENT_INFO_MUTEX);
+
+    return re;
+}
+
+int clt_add_R(clt_lnk Tree, clt_lnk NewClient)
+{
+
+    if (!INIS)
+        clt_inis();
+
+    for (int i = 0; i < 37; i++)
+    {
+        if ((New_Client->Client.GUID[i]) < (Tree->Client.GUID[i]))
+        {
+            if (!(Tree->right))
+                return clt_add_R(Tree->right, NewClient);
+            else
+            {
+                Tree->right = NewClient;
+                return 0;
+            }
+        }
+        else if ((New_Client->Client.GUID[i]) > (Tree->Client.GUID[i]))
+        {
+            if (!(Tree->left))
+                return clt_add_R(Tree->left, NewClient);
+            else
+            {
+                Tree->left = NewClient;
+                return 0;
+            }
+        }
+    }
+
+    return -1;
+}
+
+int clt_find_local_uuid(clt_lnk Tree, char *GUID, clt_lnk *Client)
+{
+    if ((*Tree) == NULL)
+        return -1;
+
+    for (int i = 0; i < 37; i++)
+    {
+        if ((GUID[i]) < (Tree->Client.GUID[i]))
+        {
+            if (!(Tree->right))
+                return clt_find_local_uuid(Tree->right, GUID, NewClient);
+        }
+        else if ((GUID[i]) > (Tree->Client.GUID[i]))
+        {
+            if (!(Tree->left))
+                return clt_find_local_uuid(Tree->left, NewClient);
+        }
+    }
+
+    *Client = Tree;
+    return 0;
 
     return 0;
 }

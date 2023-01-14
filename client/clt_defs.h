@@ -19,8 +19,8 @@ struct client_links
 {
     int INDEX;
     clt_inf Client;
-    clt_lnk prev;
-    clt_lnk next;
+    clt_lnk left;
+    clt_lnk right;
 };
 
 extern clt_lnk CLT_LIST;
@@ -43,7 +43,6 @@ extern int clt_inis();
 extern clt_lnk clt_new(clt_inf Info);
 
 /// @param Info Client Information (See struct client_info)
-
 /// @brief Creates new Client Structure
 /// @param file
 /// @param sock
@@ -53,11 +52,16 @@ extern clt_lnk clt_new(clt_inf Info);
 /// @return clt_inf : New Client info struct
 extern clt_inf clt_inf_new(FILE *file, int sock, int ID, char *ID, sa_in Addr);
 
-// Add a Client
-// Returns:
-// INTEGER -> index
-//-1 -> Error Somewere
+/// @brief Add Client to the Binary Search Tree.
+/// @param NewClient
+/// @return 0 => Client Added Successfully || -1 => Client Already Exists
 extern int clt_add(clt_lnk New_Client);
+
+/// @brief Add Client to the Binary Search Tree Recursively.
+/// @param Tree Head
+/// @param NewClient
+/// @return 0 => Client Added Successfully || -1 => Client Already Exists
+extern int clt_add_R(clt_lnk Tree, clt_lnk NewClient);
 /*
 //Check for past Connections
 // Returns:
@@ -65,9 +69,16 @@ extern int clt_add(clt_lnk New_Client);
 // 0 -> Correct
 // 1 -> Incorrect
 
-extern int clt_find_local_index(int index, clt_lnk* New_Client);
 extern int clt_find_local_sock(int sock, clt_lnk* New_Client);
-extern int clt_find_local_uuid(const char* UUID, clt_lnk* New_Client);
+*/
+
+/// @brief Binary Search Tree of a Client Using GUID ( Currently being the fastest search method due to GUID being the Primary Index).
+/// @param Tree
+/// @param GUID
+/// @param Client
+/// @return 0 => Client Found and Returned in *Client* parameter. || -1 => Client Not Found.
+extern int clt_find_local_uuid(clt_lnk Tree, char *GUID, clt_lnk *Client);
+/*
 extern int clt_find_local_id(int ID, clt_lnk *New_Client);
 
 //Deletion Functions
