@@ -99,13 +99,17 @@ int CLT_CNTRL_LOGI(clt_lnk *client)
     Msg = calloc(MsgSize, sizeof(char));
     recv(clt->Client.sock, Msg, MsgSize, 0);
     teprintf("Received Username : ");
-    send(clt->Client.sock, CMD_CLT_SND_PSWD, 4, 0);
+    printf(Msg);
+    teprintf("Received Username : ");
+    printf(Msg);
 
     recv(clt->Client.sock, MsgSizeString, 5, 0);
     checkerr((MsgSize = FBSizeToInt(MsgSizeString)));
     Msg = calloc(MsgSize, sizeof(char));
     recv(clt->Client.sock, Msg, MsgSize, 0);
+    teprintf("Received Password : ");
     printf(Msg);
+    send(clt->Client.sock, CMD_CLT_SND_PSWD, 4, 0);
 
     return 0;
 }

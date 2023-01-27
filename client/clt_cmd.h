@@ -19,7 +19,7 @@
 #define CMD_CLT_SND_MACA "013" // Sending a request for the client's MAC Adress !! Not Applicable !!
 
 #define CMD_CLT_RCV_LOGI "110" // Client Attempting to login
-#define CMD_CLT_RCV_REGS "111" // Client Attempting to register an account
+#define CMD_CLT_RCV_REGS "111" // Client Attempting to register an account.
 #define CMD_CLT_RCV_LOGO "11F" // Client Attempting to logout
 #define CMD_CLT_RCV_INFO "101" // Client requesting his account's info
 #define CMD_CLT_RCV_OINF "102" // Client requesting another account's info
