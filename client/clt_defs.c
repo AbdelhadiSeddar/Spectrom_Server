@@ -8,7 +8,6 @@ int INIS = 0;
 
 int clt_inis()
 {
-    CURRENT_INDEX = 0;
     INIS = 1;
     NULL_CLIENT = malloc(sizeof(*NULL_CLIENT));
     CLT_LIST = NULL_CLIENT;
@@ -46,7 +45,7 @@ int clt_add(clt_lnk New_Client)
     /// Recive GUID
     char *err;
     sprintf(err, "Could not Initialize Mutex for Client On Socket : %d", (New_Client->Client.sock));
-    checkerr(pthread_mutex_init((New_Client->MUTEX), err));
+    checkerr(pthread_mutex_init(&(New_Client->MUTEX), NULL), err));
     pthread_mutex_lock(&(New_Client->MUTEX));
     send((New_Client->Client.sock), CMD_CLT_SND_GUID, 4, 0);
     recv((New_Client->Client.sock), (New_Client->Client.GUID), 37, 0);
@@ -70,7 +69,7 @@ int clt_add_R(clt_lnk Tree, clt_lnk NewClient)
 
     for (int i = 0; i < 37; i++)
     {
-        if ((New_Client->Client.GUID[i]) < (Tree->Client.GUID[i]))
+        if ((NewClient->Client.GUID[i]) < (Tree->Client.GUID[i]))
         {
             if (!(Tree->right))
                 return clt_add_R(Tree->right, NewClient);
@@ -80,7 +79,7 @@ int clt_add_R(clt_lnk Tree, clt_lnk NewClient)
                 return 0;
             }
         }
-        else if ((New_Client->Client.GUID[i]) > (Tree->Client.GUID[i]))
+        else if ((NewClient->Client.GUID[i]) > (Tree->Client.GUID[i]))
         {
             if (!(Tree->left))
                 return clt_add_R(Tree->left, NewClient);
@@ -105,12 +104,12 @@ int clt_find_local_uuid(clt_lnk Tree, char *GUID, clt_lnk *Client)
         if ((GUID[i]) < (Tree->Client.GUID[i]))
         {
             if (!(Tree->right))
-                return clt_find_local_uuid(Tree->right, GUID, NewClient);
+                return clt_find_local_uuid(Tree->right, GUID, Client);
         }
         else if ((GUID[i]) > (Tree->Client.GUID[i]))
         {
             if (!(Tree->left))
-                return clt_find_local_uuid(Tree->left, NewClient);
+                return clt_find_local_uuid(Tree->left, Client);
         }
     }
 

@@ -45,7 +45,7 @@ extern clt_lnk clt_new(clt_inf Info);
 /// @param ID
 /// @param Addr
 /// @return clt_inf => New Client info struct
-extern clt_inf clt_inf_new(FILE *file, int sock, int ID, char *ID, sa_in Addr);
+extern clt_inf clt_inf_new(FILE *file, int sock, int ID, char *GUID, sa_in Addr);
 
 /// @brief Add Client to the Binary Search Tree.
 /// @param NewClient

@@ -2,7 +2,7 @@
 
 void *srvr_accept_clt(void *arg)
 {
-    clt_inf *Temp = malloc(sizeof(clt_inf));
+    clt_inf *TEMP = malloc(sizeof(clt_inf));
     unsigned int client_size = sizeof(struct sockaddr_in);
     (TEMP->addr) = malloc((size_t)client_size);
     int error = 0;
@@ -19,8 +19,8 @@ void *srvr_accept_clt(void *arg)
         else
             exit(1);
     }
-
-    tprintf("Accepted client %d, on socket %d\n", clts, (TEMP->sock));
+    tprintf("");
+    printf("Accepted client %d, on socket %d\n", clts, (TEMP->sock));
     if (clts)
     {
         // When accepted
@@ -39,9 +39,9 @@ void *srvr_clt_handle(void *arg)
 {
     char *GUID[37];
     clt_lnk clt;
-    ST_T info = (ST_T)&arg;
+    ST_T info = *arg;
     recv(info.SOCK, GUID, 37, 0);
-    clt_find_local_uuid(NULL_CLIENT, GUID, &clt);
+    clt_find_local_uuid(NULL_CLIENT, &GUID, &clt);
     clt_handling(&clt);
 
     if (info.THREAD == &CLIENT_THREAD[0])
@@ -55,12 +55,12 @@ void clt_handling(clt_lnk *clt)
 {
     char *rcv[4];
     recv((*clt)->Client.sock, rcv, 4, 0);
-    if (rcv[1] == '1')
-        switch (rcv[2])
+    if (&(rcv[1]) == '1')
+        switch (&(rcv[2]))
         {
         case '1':
 
-            switch (rcv[3])
+            switch (&(rcv[3]))
             {
             case '0':
                 checkerr(CLT_CNTRL_LOGI(clt), "Error While Logging Client");
@@ -92,10 +92,10 @@ int CLT_CNTRL_LOGI(clt_lnk *client)
     clt_lnk clt = *client;
     int MsgSize;
     char *Msg, MsgSizeString[5];
-    send(clt->Client.sock, CMD_CLT_SND_URN, 4, 0);
+    send(clt->Client.sock, CMD_CLT_SND_USRN, 4, 0);
 
     recv(clt->Client.sock, MsgSizeString, 5, 0);
-    checkerr((MsgSize = FBSizeToInt(MsgSizeString)));
+    checkerr((MsgSize = FBSizeToInt(MsgSizeString)), "Could Not Write Message Size into and Int CHECK the VALUE!");
     Msg = calloc(MsgSize, sizeof(char));
     recv(clt->Client.sock, Msg, MsgSize, 0);
     teprintf("Received Username : ");

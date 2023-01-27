@@ -6,7 +6,7 @@
 typedef struct epoll_event epoll_ev;
 
 extern int n_fds, epollfd;
-extern epoll_ev ev, evs[MAX];
+extern epoll_ev ev, evs[MAXEVENTS];
 
 extern void epoll_inis();
 extern void epoll_load_fds();
