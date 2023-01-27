@@ -1,19 +1,20 @@
 #include "../_Imports.h"
+int server_sock, SERVER_STATE = 0, CLIENTS_STATE = 0;
+pthread_t SERVER_THREAD;
+pthread_t CLIENT_THREAD[2];
+pthread_mutex_t SERVER_MUTEX;
+pthread_mutex_t CLIENT_MUTEX[2];
 
 void srvr_load(int argc, char *argv[])
 {
     printf("Starting Time is ");
     tprintf("");
     tprintf("Declaring Locals\n");
-    int server_sock;
+
     struct sockaddr_in server_addr;
     tprintf("Initializing Mutexes\n");
 
-    if (pthread_mutex_init(&CURRENT_INFO_MUTEX, NULL) != 0)
-    {
-        perror("\n mutex init has failed\n");
-        exit(1);
-    }
+    checkerr((pthread_mutex_init(&CURRENT_INFO_MUTEX, NULL) != 0), "Could not Initialize CURRENT_INFO_MUTEX");
 
     tprintf("Inisialising the List\n");
     clt_inis();
@@ -61,46 +62,72 @@ void srvr_load(int argc, char *argv[])
     pthread_t cmd;
     pthread_create(&cmd, NULL, srvr_cmd, NULL);
 
-    srvr_listen(server_sock, argc, argv);
+    srvr_listen(argc, argv);
 }
 
-void srvr_listen(int server_sock, int argc, char *argv[])
+void srvr_listen(int argc, char *argv[])
 {
-    clt_inf *TEMP;
-    unsigned int client_size = sizeof(struct sockaddr_in);
-    int error = 0;
-    int clts = 0;
+    epoll_inis();
+    checkerr(pthread_mutex_init(&SERVER_MUTEX, NULL), "SERVER_MUTEX Could not be Initialized");
 re:;
     for (;;)
     {
+        epoll_load_fds();
 
-        TEMP = malloc(sizeof(clt_inf));
-        (TEMP->addr) = NULL;
-        (TEMP->addr) = malloc(sizeof(struct sockaddr_in));
-
-        if (((TEMP->sock) = accept(server_sock, (struct sockaddr *)&(TEMP->addr), &client_size)) < 0)
+        for (int n = 0; n < n_fds; ++n)
         {
-            perror("Accept() ");
-            if (error < 20)
+            if (evs[n].data.fd == server_sock)
             {
-                error++;
-                goto re;
+                if (pthread_mutex_trylock(&SERVER_MUTEX) < -1)
+                {
+                    if (errno != EBUSY)
+                    {
+                        checkerr(-1, "Error handling SERVER_MUTEX");
+                    }
+                    else
+                    {
+                        if (SEVER_STATE)
+                            pthread_mutex_unlock(&SERVER_MUTEX);
+                        else
+                            continue;
+                    }
+                }
+                pthread_create(&SERVER_THREAD, NULL, srvr_accept_clt, NULL);
             }
             else
-                exit(1);
-        }
+            {
+                int i = 0;
+                do
+                {
+                    i = !i;
+                    if (pthread_mutex_trylock(&CLIENT_MUTEX[i]) < -1)
+                    {
+                        if (errno == EBUSY)
+                        {
+                            if (CLIENTS_STATE == 11)
+                                continue;
+                            else if (CLIENTS_STATE == 1)
+                                pthread_mutex_unlock(&CLIENT_MUTEX[0]);
+                            else if (CLIENT_STATE == 10)
+                                pthread_mutex_unlock(&CLIENT_MUTEX[1]);
+                            else if (CLIENT_STATE != 0)
+                                checkerr(-1, "Invalid CLIENT_STATE value");
+                        }
+                        else
+                            checkerr(-1, "Could not Lock CLIENT_MUTEX");
+                    }
+                    ST_T ST_INFO;
+                    ST_INFO.SOCK = evs[n].data.fd;
+                    ST_INFO.THREAD = &CLIENT_THREAD[i];
+                    if (!i) // == 0
+                        CLIENTS_STATE++;
+                    else
+                        CLLIENTS_STATE += 10;
 
-        tprintf("Accepted client %d, on socket %d\n", clts, (TEMP->sock));
-        if (clts)
-        {
-            // When accepted
-            clt_add(clt_new(*TEMP));
-            clts++;
-        }
-        else
-        {
-            close((TEMP->sock));
-            free(*TEMP);
+                    pthread_create(&(CLIENT_THREAD[i]), NULL, srvr_clt_handle, (void *)&ST_INFO);
+                    break;
+                } while (1);
+            }
         }
     }
 }

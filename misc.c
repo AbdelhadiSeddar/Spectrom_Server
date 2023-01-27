@@ -1,49 +1,83 @@
 #include "_Imports.h"
 
-struct tm GT() {
-    time_t t = time(NULL);
-    return *localtime(&t);
+TM GT()
+{
+	time_t t = time(NULL);
+	return *localtime(&t);
 }
 
-void tprintf(char* string){
-    struct tm Time = GT();
-    printf("[ %d-%d | %d:%d:%d ]\t", Time.tm_mon,Time.tm_mday, Time.tm_hour, Time.tm_min, Time.tm_sec);
-    printf("%s\n", string);
+void tprintf(char *string)
+{
+	TM Time = GT();
+	printf("\n[ %d-%d | %d:%d:%d ]\t", Time.tm_mon, Time.tm_mday, Time.tm_hour, Time.tm_min, Time.tm_sec);
+	printf("%s", string);
 }
 
-void teprintf(char* string){
-    tprintf("");
-    perror(string);
+void teprintf(char *string)
+{
+	tprintf("");
+	perror(string);
 }
 
+void checkerr(int res, char *MsgIfErr)
+{
+	if (res < 0)
+	{
+		teprintf(MsgIfErr);
+		exit(EXIT_FAILURE);
+	}
+}
 
-//Gets the size of the message in a 4 Byte Sequence; 
-// Note Returns 9999 if Size if too large;
-void FByteSize(char* string, char* Re_Size){
-	char re[4];
-    char* check = string;
-    int count = 0;
-    while(*check != '\0'){
-        count++;
-        check++;
-    }
-	if(count <= 9){
+void FByteSize(char *string, char *Re_Size)
+{
+	char re[5];
+	char *check = string;
+	int count = 0;
+	while (*check != '\0')
+	{
+		count++;
+		check++;
+	}
+	if (count <= 9)
+	{
 		sprintf(Re_Size, "000%d", count);
 	}
-	else if (count <= 99){
+	else if (count <= 99)
+	{
 		sprintf(Re_Size, "00%d", count);
 	}
-	else if (count <= 999){
+	else if (count <= 999)
+	{
 		sprintf(Re_Size, "0%d", count);
 	}
-	else if(count <= 9999){
+	else if (count <= 9999)
+	{
 		sprintf(Re_Size, "%d", count);
 	}
-	else{
+	else
+	{
 		sprintf(Re_Size, "9999");
 	}
 }
 
-void fscan(char* string){
+int FBSizeToInt(char *FBSize)
+{
+	char *size = FBSize;
+	int i = 0, res = 0;
+
+	while (size != "\0")
+	{
+		if (size[i] >= 48 && size[i] <= 57)
+		{
+			res = res * 10 + (size[i] - 48);
+		}
+		else
+			return -1;
+	}
+	return res;
+}
+
+void fscan(char *string)
+{
 	scanf("%[^\n]%*c", string);
 }

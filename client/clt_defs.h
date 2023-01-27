@@ -17,50 +17,46 @@ struct client_info
 
 struct client_links
 {
+    pthread_mutex_t MUTEX;
     int INDEX;
     clt_inf Client;
     clt_lnk left;
     clt_lnk right;
 };
 
+extern pthread_mutex_t CURRENT_INFO_MUTEX;
+extern int INIS;
 extern clt_lnk CLT_LIST;
 extern clt_lnk NULL_CLIENT;
-extern clt_lnk CURRENT_CLIENT;
-extern int CURRENT_INDEX;
-extern int INIS;
-extern pthread_mutex_t CURRENT_INFO_MUTEX;
 
-// Initialises the
-// Clients linked List
-// Return :
-//  0 -> Success
-//  -1-> Failure
+/// @brief Initialise Client List
+/// @return -1 => Error |[]| 0 => Initialized.
 extern int clt_inis();
 
 /// @brief Creates new Client Structure
 /// @param Info Client Information (See struct client_info)
-/// @return NULL : ERROR || clt_lnk : Pointer to new Client
+/// @return NULL => ERROR |[]| clt_lnk => Pointer to new Client
 extern clt_lnk clt_new(clt_inf Info);
 
-/// @param Info Client Information (See struct client_info)
 /// @brief Creates new Client Structure
+/// @param Info Client Information (See struct client_info)
 /// @param file
 /// @param sock
 /// @param ID
 /// @param ID
 /// @param Addr
-/// @return clt_inf : New Client info struct
+/// @return clt_inf => New Client info struct
 extern clt_inf clt_inf_new(FILE *file, int sock, int ID, char *ID, sa_in Addr);
 
 /// @brief Add Client to the Binary Search Tree.
 /// @param NewClient
-/// @return 0 => Client Added Successfully || -1 => Client Already Exists
+/// @return 0 => Client Added Successfully |[]| -1 => Client Already Exists
 extern int clt_add(clt_lnk New_Client);
 
 /// @brief Add Client to the Binary Search Tree Recursively.
 /// @param Tree Head
 /// @param NewClient
-/// @return 0 => Client Added Successfully || -1 => Client Already Exists
+/// @return 0 => Client Added Successfully |[]| -1 => Client Already Exists
 extern int clt_add_R(clt_lnk Tree, clt_lnk NewClient);
 /*
 //Check for past Connections
@@ -76,7 +72,7 @@ extern int clt_find_local_sock(int sock, clt_lnk* New_Client);
 /// @param Tree
 /// @param GUID
 /// @param Client
-/// @return 0 => Client Found and Returned in *Client* parameter. || -1 => Client Not Found.
+/// @return 0 => Client Found and Returned in *Client* parameter. |[]| -1 => Client Not Found.
 extern int clt_find_local_uuid(clt_lnk Tree, char *GUID, clt_lnk *Client);
 /*
 extern int clt_find_local_id(int ID, clt_lnk *New_Client);
