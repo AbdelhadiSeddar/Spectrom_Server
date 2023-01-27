@@ -86,7 +86,7 @@ re:;
                     }
                     else
                     {
-                        if (SEVER_STATE)
+                        if (SERVER_STATE)
                             pthread_mutex_unlock(&SERVER_MUTEX);
                         else
                             continue;
@@ -108,9 +108,9 @@ re:;
                                 continue;
                             else if (CLIENTS_STATE == 1)
                                 pthread_mutex_unlock(&CLIENT_MUTEX[0]);
-                            else if (CLIENT_STATE == 10)
+                            else if (CLIENTS_STATE == 10)
                                 pthread_mutex_unlock(&CLIENT_MUTEX[1]);
-                            else if (CLIENT_STATE != 0)
+                            else if (CLIENTS_STATE != 0)
                                 checkerr(-1, "Invalid CLIENT_STATE value");
                         }
                         else
@@ -122,7 +122,7 @@ re:;
                     if (!i) // == 0
                         CLIENTS_STATE++;
                     else
-                        CLLIENTS_STATE += 10;
+                        CLIENTS_STATE += 10;
 
                     pthread_create(&(CLIENT_THREAD[i]), NULL, srvr_clt_handle, (void *)&ST_INFO);
                     break;
