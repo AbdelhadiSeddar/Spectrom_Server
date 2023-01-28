@@ -44,11 +44,15 @@ void srvr_load(int argc, char *argv[])
 
     tprintf("Binded\n");
     sleep(1);
-
-    tprintf("Setting up Socket (%d) to listen\n", server_sock);
-    tprintf("Socket Queue is %s", (MAX_QUEUE != 0) ? "Set to " : "Not Set\n");
+    tprintf("");
+    printf("Setting up Socket (%d) to listen\n", server_sock);
+    tprintf("");
+    printf("Socket Queue is %s", (MAX_QUEUE != 0) ? "Set to " : "Not Set\n");
     if (MAX_QUEUE)
-        tprintf("%d allowed connections pending\n", MAX_QUEUE);
+    {
+        tprintf("");
+        printf("%d allowed connections pending\n", MAX_QUEUE);
+    }
 
     sleep(1);
     if (listen(server_sock, 100) < 0)

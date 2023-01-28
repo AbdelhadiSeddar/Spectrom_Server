@@ -7,7 +7,7 @@ void *srvr_accept_clt(void *arg)
     (TEMP->addr) = malloc((size_t)client_size);
     int error = 0;
     int clts = 0;
-
+re:;
     if (((TEMP->sock) = accept(server_sock, (struct sockaddr *)&(TEMP->addr), &client_size)) < 0)
     {
         perror("Accept() ");
@@ -30,18 +30,17 @@ void *srvr_accept_clt(void *arg)
     else
     {
         close((TEMP->sock));
-        free(*TEMP);
     }
     SERVER_STATE = !SERVER_STATE;
 }
 
 void *srvr_clt_handle(void *arg)
 {
-    char *GUID[37];
+    char GUID[37];
     clt_lnk clt;
-    ST_T info = *arg;
+    ST_T info = (struct SOCKET_THREAD_T)arg;
     recv(info.SOCK, GUID, 37, 0);
-    clt_find_local_uuid(NULL_CLIENT, &GUID, &clt);
+    clt_find_local_uuid(NULL_CLIENT, GUID, &clt);
     clt_handling(&clt);
 
     if (info.THREAD == &CLIENT_THREAD[0])
@@ -53,14 +52,14 @@ void *srvr_clt_handle(void *arg)
 
 void clt_handling(clt_lnk *clt)
 {
-    char *rcv[4];
+    char rcv[4];
     recv((*clt)->Client.sock, rcv, 4, 0);
-    if (&(rcv[1]) == '1')
-        switch (&(rcv[2]))
+    if ((rcv[1]) == '1')
+        switch ((rcv[2]))
         {
         case '1':
 
-            switch (&(rcv[3]))
+            switch ((rcv[3]))
             {
             case '0':
                 checkerr(CLT_CNTRL_LOGI(clt), "Error While Logging Client");
@@ -104,7 +103,7 @@ int CLT_CNTRL_LOGI(clt_lnk *client)
     printf(Msg);
 
     recv(clt->Client.sock, MsgSizeString, 5, 0);
-    checkerr((MsgSize = FBSizeToInt(MsgSizeString)));
+    checkerr((MsgSize = FBSizeToInt(MsgSizeString)), "Could Not Load Size Into an int");
     Msg = calloc(MsgSize, sizeof(char));
     recv(clt->Client.sock, Msg, MsgSize, 0);
     teprintf("Received Password : ");

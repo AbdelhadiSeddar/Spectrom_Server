@@ -7,7 +7,7 @@ char* GETIP();
 
 extern void *srvr_accept_clt(void *arg);
 extern void *srvr_clt_handle(void *arg);
-extern void clt_handling(void *clt);
+extern void clt_handling(clt_lnk *clt);
 
 extern int CLT_CNTRL_LOGI(clt_lnk *client);
 extern int CLT_CNTRL_REGS(clt_lnk *client);
