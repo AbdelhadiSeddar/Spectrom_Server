@@ -38,7 +38,8 @@ void *srvr_clt_handle(void *arg)
 {
     char GUID[37];
     clt_lnk clt;
-    ST_T info = (struct SOCKET_THREAD_T)arg;
+    ST_T *inf = arg;
+    ST_T info = *inf;
     recv(info.SOCK, GUID, 37, 0);
     clt_find_local_uuid(NULL_CLIENT, GUID, &clt);
     clt_handling(&clt);
