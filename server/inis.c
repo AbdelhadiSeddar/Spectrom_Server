@@ -91,7 +91,7 @@ re:;
                     else
                     {
                         if (SERVER_STATE)
-                            pthread_mutex_unlock(&SERVER_MUTEX);
+                            printf("Test1");
                         else
                             continue;
                     }
@@ -142,6 +142,6 @@ void *srvr_cmd(void *_args)
 e:;
     char cmd[10];
     scanf("%s", cmd);
-    debug_clt_list();
+    printf(cmd);
     goto e;
 }
