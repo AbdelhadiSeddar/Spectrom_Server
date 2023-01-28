@@ -41,6 +41,10 @@ clt_inf clt_inf_new(FILE *file, int sock, int ID, char *GUID, sa_in Addr)
 
 int clt_add(clt_lnk New_Client)
 {
+    SetNonBlocking((New_Client->Client.sock));
+    ev.events = EPOLLIN | EPOLLET;
+    ev.data.fd = (New_Client->Client.sock);
+    checkerr(epoll_ctl(epollfd, EPOLL_CTL_ADD, (New_Client->Client.sock), &ev), "Could Not Add the Client event");
     send((New_Client->Client.sock), CMD_CONN_ACC, 4, 0);
     /// Recive GUID
     char *err;
