@@ -91,11 +91,12 @@ re:;
                     else
                     {
                         if (SERVER_STATE)
-                            printf("Test1");
+                            pthread_mutex_unlock(&SERVER_MUTEX);
                         else
                             continue;
                     }
                 }
+                printf("Test1");
                 pthread_create(&SERVER_THREAD, NULL, srvr_accept_clt, NULL);
             }
             else
@@ -120,6 +121,8 @@ re:;
                         else
                             checkerr(-1, "Could not Lock CLIENT_MUTEX");
                     }
+
+                    printf("EY");
                     ST_T ST_INFO;
                     ST_INFO.SOCK = evs[n].data.fd;
                     ST_INFO.THREAD = &CLIENT_THREAD[i];
