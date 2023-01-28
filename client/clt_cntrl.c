@@ -98,16 +98,16 @@ int CLT_CNTRL_LOGI(clt_lnk *client)
     checkerr((MsgSize = FBSizeToInt(MsgSizeString)), "Could Not Write Message Size into and Int CHECK the VALUE!");
     Msg = calloc(MsgSize, sizeof(char));
     recv(clt->Client.sock, Msg, MsgSize, 0);
-    teprintf("Received Username : ");
+    tprintf("Received Username : ");
     printf(Msg);
-    teprintf("Received Username : ");
+    tprintf("Received Username : ");
     printf(Msg);
 
     recv(clt->Client.sock, MsgSizeString, 5, 0);
     checkerr((MsgSize = FBSizeToInt(MsgSizeString)), "Could Not Load Size Into an int");
     Msg = calloc(MsgSize, sizeof(char));
     recv(clt->Client.sock, Msg, MsgSize, 0);
-    teprintf("Received Password : ");
+    tprintf("Received Password : ");
     printf(Msg);
     send(clt->Client.sock, CMD_CLT_SND_PSWD, 4, 0);
 

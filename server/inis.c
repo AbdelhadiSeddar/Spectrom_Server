@@ -127,7 +127,8 @@ re:;
                         CLIENTS_STATE++;
                     else
                         CLIENTS_STATE += 10;
-
+                    tprintf("");
+                    printf("Selected Thread [ %d ] for socket %d ", i, ST_INFO.SOCK);
                     pthread_create(&(CLIENT_THREAD[i]), NULL, srvr_clt_handle, (void *)&ST_INFO);
                     break;
                 } while (1);
