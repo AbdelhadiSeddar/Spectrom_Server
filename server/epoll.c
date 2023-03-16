@@ -15,7 +15,10 @@ void epoll_inis()
 
 void epoll_load_fds()
 {
-    checkerr((n_fds = epoll_wait(epollfd, evs, MAXEVENTS, 10)), "Could Not get the number of Fds (epoll_wait)");
+    do
+    {
+        n_fds = epoll_wait(epollfd, evs, MAXEVENTS, 10);
+    } while (n_fds == 0 && errno == EINTR);
 }
 
 int SetNonBlocking(int fd)

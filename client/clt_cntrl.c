@@ -1,12 +1,12 @@
 #include "../_Imports.h"
-
+int clts = 0;
 void *srvr_accept_clt(void *arg)
 {
     clt_inf *TEMP = malloc(sizeof(clt_inf));
     unsigned int client_size = sizeof(struct sockaddr_in);
     (TEMP->addr) = malloc((size_t)client_size);
     int error = 0;
-    int clts = 0;
+
 re:;
     if (((TEMP->sock) = accept(server_sock, (struct sockaddr *)&(TEMP->addr), &client_size)) < 0)
     {
@@ -19,19 +19,15 @@ re:;
         else
             exit(1);
     }
-    tprintf("");
-    printf("Accepted client %d, on socket %d\n", clts, (TEMP->sock));
-    if (clts)
-    {
-        // When accepted
-        clt_add(clt_new(*TEMP));
-        clts++;
-    }
     else
-    {
-        close((TEMP->sock));
-    }
-    SERVER_STATE = !SERVER_STATE;
+        clts++;
+
+    printf("Accepted client %d, on socket %d\n", clts, (TEMP->sock));
+    (TEMP->ID) = clts;
+    // When accepted
+    clt_add(clt_new(*TEMP));
+
+    SERVER_STATE = 0;
 }
 
 void *srvr_clt_handle(void *arg)
@@ -41,7 +37,18 @@ void *srvr_clt_handle(void *arg)
     ST_T *inf = arg;
     ST_T info = *inf;
     recv(info.SOCK, GUID, 37, 0);
-    clt_find_local_uuid(NULL_CLIENT, GUID, &clt);
+    tprintf(GUID);
+    printf("\n");
+    checkerr(clt_find_local_uuid(NULL_CLIENT, GUID, &clt), "Could Not find USER");
+    if (clt != NULL)
+        tprintf("found");
+    else
+    {
+        tprintf("Client Is NULL");
+        return NULL;
+    }
+    printf((clt->Client.GUID));
+    printf(" ++++ ");
     clt_handling(&clt);
 
     if (info.THREAD == &CLIENT_THREAD[0])

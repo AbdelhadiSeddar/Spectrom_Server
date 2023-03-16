@@ -4,6 +4,7 @@
 /*
 char* GETIP();
 */
+extern int clts;
 
 extern void *srvr_accept_clt(void *arg);
 extern void *srvr_clt_handle(void *arg);

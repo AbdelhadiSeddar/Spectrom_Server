@@ -55,11 +55,7 @@ void srvr_load(int argc, char *argv[])
     }
 
     sleep(1);
-    if (listen(server_sock, 100) < 0)
-    {
-        perror("Listen()");
-        exit(1);
-    }
+    checkerr(listen(server_sock, 100), "Listen Failed.");
 
     tprintf("Setting up Listener\n");
 
@@ -71,6 +67,7 @@ void srvr_load(int argc, char *argv[])
 
 void srvr_listen(int argc, char *argv[])
 {
+    tprintf("Initalizing Epoll");
     epoll_inis();
     checkerr(pthread_mutex_init(&SERVER_MUTEX, NULL), "SERVER_MUTEX Could not be Initialized");
 re:;
@@ -80,6 +77,7 @@ re:;
 
         for (int n = 0; n < n_fds; ++n)
         {
+            char PEEK[4];
             if (evs[n].data.fd == server_sock)
             {
                 if (pthread_mutex_trylock(&SERVER_MUTEX) < -1)
@@ -90,14 +88,22 @@ re:;
                     }
                     else
                     {
-                        if (SERVER_STATE)
+                        if (!SERVER_STATE)
                             pthread_mutex_unlock(&SERVER_MUTEX);
                         else
                             continue;
                     }
                 }
-                printf("Test1");
-                pthread_create(&SERVER_THREAD, NULL, srvr_accept_clt, NULL);
+                else if (recv(server_sock, PEEK, 4, MSG_PEEK) != 0)
+                {
+                    if (!SERVER_STATE)
+                    {
+                        SERVER_STATE = 1;
+                        tprintf("Test1");
+                        pthread_create(&SERVER_THREAD, NULL, srvr_accept_clt, NULL);
+                        continue;
+                    }
+                }
             }
             else
             {
@@ -119,10 +125,12 @@ re:;
                                 checkerr(-1, "Invalid CLIENT_STATE value");
                         }
                         else
-                            checkerr(-1, "Could not Lock CLIENT_MUTEX");
+                        {
+                            continue;
+                        }
                     }
 
-                    printf("EY");
+                    tprintf("Got ahold of a Mutex and initializing Client.");
                     ST_T ST_INFO;
                     ST_INFO.SOCK = evs[n].data.fd;
                     ST_INFO.THREAD = &CLIENT_THREAD[i];
@@ -131,7 +139,7 @@ re:;
                     else
                         CLIENTS_STATE += 10;
                     tprintf("");
-                    printf("Selected Thread [ %d ] for socket %d ", i, ST_INFO.SOCK);
+                    printf("Selected Thread [ %d ] for socket %d \n", i, ST_INFO.SOCK);
                     pthread_create(&(CLIENT_THREAD[i]), NULL, srvr_clt_handle, (void *)&ST_INFO);
                     break;
                 } while (1);
