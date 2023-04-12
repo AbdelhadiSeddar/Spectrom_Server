@@ -25,8 +25,6 @@ clt_lnk clt_new(clt_inf Info)
     clt_lnk re = malloc(sizeof(clt));
 
     re->Client = Info;
-    tprintf("Completed Creating : ");
-    printf("Client %d With GUID : %s, With a ref: %p", (re->Client.ID), (re->Client.GUID), re);
     return re;
 }
 
@@ -42,10 +40,10 @@ clt_inf clt_inf_new(FILE *file, int sock, int ID, char *GUID, sa_in Addr)
 
 int clt_add(clt_lnk New_Client)
 {
-    //     SetNonBlocking((New_Client->Client.sock));
-    //     ev.events = EPOLLIN | EPOLLET;
-    //     ev.data.fd = (New_Client->Client.sock);
-    checkerr(epoll_ctl(epollfd, EPOLL_CTL_ADD, (New_Client->Client.sock), &ev), "Could Not Add the Client event");
+    ev.events = EPOLLIN | EPOLLET;
+    ev.data.fd = (New_Client->Client.sock);
+
+    epoll_add((New_Client->Client.sock), &ev);
     send((New_Client->Client.sock), CMD_CONN_ACC, 4, 0);
     /// Recive GUID
     char err[255];
@@ -54,8 +52,8 @@ int clt_add(clt_lnk New_Client)
     pthread_mutex_lock(&(New_Client->MUTEX));
     send((New_Client->Client.sock), CMD_CLT_SND_GUID, 4, 0);
     recv((New_Client->Client.sock), (New_Client->Client.GUID), 37, 0);
-    tprintf((New_Client->Client.GUID));
-    printf(" ++\n");
+
+
     pthread_mutex_unlock(&(New_Client->MUTEX));
 
     pthread_mutex_lock(&CURRENT_INFO_MUTEX);
@@ -65,9 +63,9 @@ int clt_add(clt_lnk New_Client)
     pthread_mutex_unlock(&CURRENT_INFO_MUTEX);
     send((New_Client->Client.sock), CMD_CONN_CONF, 4, 0);
     send((New_Client->Client.sock), CMD_CONN_MTH, 4, 0);
-
-    tprintf("Completed Adding : ");
-    printf("Client %d With GUID : %s", (New_Client->Client.ID), (New_Client->Client.GUID));
+    tprint();
+    printf("Completed Adding : ");
+    printf("Client %d With GUID : %s\n", (New_Client->Client.ID), (New_Client->Client.GUID));
     return re;
 }
 

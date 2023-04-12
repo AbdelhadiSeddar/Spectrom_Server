@@ -6,6 +6,7 @@
 #include <pthread.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <ctype.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/epoll.h>
@@ -14,6 +15,7 @@
 
 #include "server/inis.h"
 #include "server/epoll.h"
+#include "server/cmd.h"
 #include "main_defs.h"
 #include "misc.h"
 #include "client/clt_defs.h"

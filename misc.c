@@ -6,17 +6,26 @@ TM GT()
 	return *localtime(&t);
 }
 
-void tprintf(char *string)
+void tprint()
 {
 	TM Time = GT();
-	printf("\n[ %d-%d | %d:%d:%d ]\t", Time.tm_mon, Time.tm_mday, Time.tm_hour, Time.tm_min, Time.tm_sec);
-	printf("%s", string);
+	printf("[ %d-%d | %d:%d:%d ]\t", Time.tm_mon, Time.tm_mday, Time.tm_hour, Time.tm_min, Time.tm_sec);
+}
+
+void tprintf(char *string)
+{
+	tprint();
+	printf("%s\n", string);
 }
 
 void teprintf(char *string)
 {
-	tprintf("");
+	tprint();
 	perror(string);
+}
+void tcprintf(char *string)
+{
+	printf("]=======$ %s\n", string);
 }
 
 void checkerr(int res, char *MsgIfErr)
@@ -65,7 +74,7 @@ int FBSizeToInt(char *FBSize)
 	char *size = FBSize;
 	int i = 0, res = 0;
 
-	while (size != "\0")
+	while (size[i] != '\0')
 	{
 		if (size[i] >= 48 && size[i] <= 57)
 		{
@@ -73,11 +82,67 @@ int FBSizeToInt(char *FBSize)
 		}
 		else
 			return -1;
+
+		i++;
 	}
+	
 	return res;
+}
+
+void strtolower(char *res, const char *str)
+{
+	if (str == NULL)
+		return;
+
+	int c = 0;
+	while (str[c] != '\0')
+		c++;
+
+	if (res != NULL)
+		free(res);
+	res = malloc((c + 1) * sizeof(char));
+	c = 0;
+	do
+	{
+		res[c] = tolower(str[c]);
+		c++;
+	} while (str[c] != '\0');
+}
+
+void strtolower_s(char *strtolow)
+{
+	char *str;
+	strcpy(str, strtolow);
+	strtolower(strtolow, str);
+	free(str);
+}
+
+char* r_newline(char* str)
+{
+	char * re = strchr(str, '\n');
+	re[0] == '\n' ? re[0] = ' ' : (re[0] = re[0]);
+
+	return str; 
+}
+
+int strcmpi (const char * str1, const char * str2 )
+{
+	char* s_str1, *s_str2;
+	strcpy(s_str1, str1); strtolower_s(s_str1);
+	strcpy(s_str2, str2); strtolower_s(s_str2);
+
+	int re = strcmp(s_str1, s_str2);
+	free(s_str1); free(s_str2);
+	return re;
 }
 
 void fscan(char *string)
 {
 	scanf("%[^\n]%*c", string);
+}
+
+
+void ChangeColor(COLOR Color)
+{
+	printf(Color);
 }

@@ -5,7 +5,7 @@
 /// Part for connection status messages
 ///
 #define CMD_CONN_ACC "000"  // Accepted incoming connection
-#define CMD_CONN_CONF "001" // Confirmed incoming connection
+#define CMD_CONN_CONF "001" // Confirm
 #define CMD_CONN_BAN "00A"  // SEND BANNED STATUS
 #define CMD_CONN_KCK "00B"  // SEND KICK STATUS
 #define CMD_CONN_RCN "00C"  // FORCE RECONNECTION DUE TO AN ERROR
