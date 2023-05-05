@@ -16,9 +16,12 @@ extern int FBSizeToInt(char *FBSize);
 
 extern void tprint();
 extern void tprintf(char *string);
-extern void tsprintf(char *string);
 extern void teprintf(char *string);
 extern void tcprintf(char *string);
+
+extern void twprint();
+extern void tprintw(char *string);
+extern void tcprintw(char *string);
 
 /// @brief Check if res is a Negative Number. ( < 0 )
 /// @param res Result
@@ -40,29 +43,20 @@ extern void fscan(char *string);
 extern int strcmpi (const char * str1, const char * str2 );
 
 
+/// @brief Check Client's Username.
+/// @param Username ** Return The Username IF Existant
+/// @param ID
+/// @return  1 => Allowed Char |[]| 0 => Non-Allowed Char
+int IsInAllowedChars(char c)
 
 
 
 typedef char* COLOR;
 //Regular text
-#define R_BLK "\e[0;30m"
-#define R_RED "\e[0;31m"
-#define R_GRN "\e[0;32m"
-#define R_YEL "\e[0;33m"
-#define R_BLU "\e[0;34m"
-#define R_MAG "\e[0;35m"
-#define R_CYN "\e[0;36m"
-#define R_WHT "\e[0;37m"
+
 
 //Regular bold text
-#define B_BLK "\e[1;30m"
-#define B_RED "\e[1;31m"
-#define B_GRN "\e[1;32m"
-#define B_YEL "\e[1;33m"
-#define B_BLU "\e[1;34m"
-#define B_MAG "\e[1;35m"
-#define B_CYN "\e[1;36m"
-#define B_WHT "\e[1;37m"
+
 
 //Regular underline text
 #define U_BLK "\e[4;30m"

@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include <stdio.h>
+#include <ncurses.h>
 #include <string.h>
 #include <unistd.h>
 #include <assert.h>
@@ -16,6 +16,7 @@
 #include "server/inis.h"
 #include "server/epoll.h"
 #include "server/cmd.h"
+#include "server/intrf.h"
 #include "main_defs.h"
 #include "misc.h"
 #include "client/clt_defs.h"

@@ -23,9 +23,20 @@ void teprintf(char *string)
 	tprint();
 	perror(string);
 }
-void tcprintf(char *string)
+
+void tcprintw(char *string)
 {
-	printf("]=======$ %s\n", string);
+	printw("]=======$ %s\n", string);
+}
+void twprint()
+{
+	TM Time = GT();
+	printw("[ %d-%d | %d:%d:%d ]\t", Time.tm_mon, Time.tm_mday, Time.tm_hour, Time.tm_min, Time.tm_sec);
+}
+void tprintw(char *string)
+{
+	tprint();
+	printw("%s\n", string);
 }
 
 void checkerr(int res, char *MsgIfErr)
@@ -80,12 +91,10 @@ int FBSizeToInt(char *FBSize)
 		{
 			res = res * 10 + (size[i] - 48);
 		}
-		else
-			return -1;
 
 		i++;
 	}
-	
+
 	return res;
 }
 
@@ -117,22 +126,25 @@ void strtolower_s(char *strtolow)
 	free(str);
 }
 
-char* r_newline(char* str)
+char *r_newline(char *str)
 {
-	char * re = strchr(str, '\n');
+	char *re = strchr(str, '\n');
 	re[0] == '\n' ? re[0] = ' ' : (re[0] = re[0]);
 
-	return str; 
+	return str;
 }
 
-int strcmpi (const char * str1, const char * str2 )
+int strcmpi(const char *str1, const char *str2)
 {
-	char* s_str1, *s_str2;
-	strcpy(s_str1, str1); strtolower_s(s_str1);
-	strcpy(s_str2, str2); strtolower_s(s_str2);
+	char *s_str1, *s_str2;
+	strcpy(s_str1, str1);
+	strtolower_s(s_str1);
+	strcpy(s_str2, str2);
+	strtolower_s(s_str2);
 
 	int re = strcmp(s_str1, s_str2);
-	free(s_str1); free(s_str2);
+	free(s_str1);
+	free(s_str2);
 	return re;
 }
 
@@ -141,8 +153,19 @@ void fscan(char *string)
 	scanf("%[^\n]%*c", string);
 }
 
-
 void ChangeColor(COLOR Color)
 {
 	printf(Color);
+}
+
+int IsInAllowedChars(char c)
+{
+	if (c >= 32 && c <= 57)
+		return 1;
+	if (c >= 63 && c <= 90)
+		return 1;
+	if (c >= 95 && c <= 122)
+		return 1;
+
+	return 0;
 }

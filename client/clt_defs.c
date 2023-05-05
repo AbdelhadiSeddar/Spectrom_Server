@@ -63,9 +63,8 @@ int clt_add(clt_lnk New_Client)
     pthread_mutex_unlock(&CURRENT_INFO_MUTEX);
     send((New_Client->Client.sock), CMD_CONN_CONF, 4, 0);
     send((New_Client->Client.sock), CMD_CONN_MTH, 4, 0);
-    tprint();
-    printf("Completed Adding : ");
-    printf("Client %d With GUID : %s\n", (New_Client->Client.ID), (New_Client->Client.GUID));
+    
+    mvprintw((MAX_Y -1 ), 0,"Completed Adding : Client %d With GUID : %s\n", (New_Client->Client.ID), (New_Client->Client.GUID));
     return re;
 }
 

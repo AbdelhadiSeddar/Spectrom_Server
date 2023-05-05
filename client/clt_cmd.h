@@ -18,9 +18,6 @@
 #define CMD_CLT_SND_PSWD "012" // Sending a request for the client's Password
 #define CMD_CLT_SND_MACA "013" // Sending a request for the client's MAC Adress !! Not Applicable !!
 
-#define CMD_CLT_RCV_LOGI "110" // Client Attempting to login
-#define CMD_CLT_RCV_REGS "111" // Client Attempting to register an account.
-#define CMD_CLT_RCV_LOGO "11F" // Client Attempting to logout
 #define CMD_CLT_RCV_INFO "101" // Client requesting his account's info
 #define CMD_CLT_RCV_OINF "102" // Client requesting another account's info
 #define CMD_CLT_RCV_SUNM "103" // Client requesting a search using Username
@@ -38,5 +35,9 @@
 #define CMD_CLT_RCV_UALB "10F" // Client requesting the addition of a user in the account's blocked list
 #define CMD_CLT_RCV_UALS "10G" // Client requesting the addition of a user in the account's Starred/Special list
 #define CMD_CLT_RCV_UALF "10H" // Client requesting the addition of a user in the account's Friends list
+
+#define CMD_CLT_RCV_LOGI "110" // Client Attempting to login
+#define CMD_CLT_RCV_REGS "111" // Client Attempting to register an account.
+#define CMD_CLT_RCV_LOGO "11F" // Client Attempting to logout
 
 #endif

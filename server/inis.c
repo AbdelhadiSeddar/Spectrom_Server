@@ -1,7 +1,7 @@
 #include "../_Imports.h"
 int server_sock, SERVER_STATE = 0, CLIENTS_STATE = 0;
 pthread_t SERVER_THREAD;
-pthread_t CMD_THREAD;
+pthread_t SRVR_LSTN_THREAD;
 pthread_t CLIENT_THREAD[2];
 pthread_mutex_t SERVER_MUTEX;
 pthread_mutex_t CLIENT_MUTEX[2];
@@ -39,9 +39,9 @@ void srvr_load(int argc, char *argv[])
     server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
     tprintf("Socket Created");
-    sleep(1);
+    // sleep(1);
     tprintf("Binding Socket");
-    sleep(1);
+    //sleep(1);
 
     if (bind(server_sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
     {
@@ -50,32 +50,30 @@ void srvr_load(int argc, char *argv[])
     }
 
     tprintf("Binded");
-    sleep(1);
-    tprintf("");
+    tprint();
     printf("Setting up Socket (%d) to listen\n", server_sock);
-    tprintf("");
+    tprint();
     printf("Socket Queue is %s", (MAX_QUEUE != 0) ? "Set to " : "Not Set\n");
     if (MAX_QUEUE)
     {
         printf("%d allowed connections pending\n", MAX_QUEUE);
     }
 
-    sleep(1);
     checkerr(listen(server_sock, 100), "Listen Failed.");
+    //sleep(1);
 
+    tprintf("Initalizing Epoll");
     tprintf("Setting up Listener");
 
-
-    srvr_listen(argc, argv);
+    tprintf("Server Succesfully Started. Accepting Requests/Commands.");
+    pthread_create(&SRVR_LSTN_THREAD, NULL, srvr_listen, NULL);
 }
 
-void srvr_listen(int argc, char *argv[])
+void *srvr_listen(void *args)
 {
-    tprintf("Initalizing Epoll");
     epoll_inis();
     checkerr(pthread_mutex_init(&SERVER_MUTEX, NULL), "SERVER_MUTEX Could not be Initialized");
-    tprintf("Server Succesfully Started. Accepting Requests/Commands.");
-    pthread_create(&CMD_THREAD, NULL, srvr_cmd, NULL);
+
     SetNonBlocking(server_sock);
 re:;
     for (;;)
@@ -136,13 +134,12 @@ re:;
                         }
                         else
                         {
-                            printf("\t++ Not Busy ++\n");
                             continue;
                         }
                     }
                     break;
                 } while (1);
-                
+
                 ST_T ST_INFO;
                 ST_INFO.SOCK = evs[n].data.fd;
                 ST_INFO.events = evs[n].events;
@@ -151,15 +148,14 @@ re:;
                     CLIENTS_STATE++;
                 else
                     CLIENTS_STATE += 10;
-
+                /*
                 tprint();
                 printf("Selected Thread [ %d ] for socket %d \n", i, ST_INFO.SOCK);
+                */
                 pthread_create(&(CLIENT_THREAD[i]), NULL, srvr_clt_handle, (void *)&ST_INFO);
             }
         }
-        sleep(3);
+        //sleep(3);
         epoll_unload_fds();
-        
     }
 }
-

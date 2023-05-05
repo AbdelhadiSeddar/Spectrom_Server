@@ -5,8 +5,10 @@ void *srvr_accept_clt(void *arg)
     clt_inf *TEMP = clt_inf_clone((clt_inf *)arg);
 
     clts++;
+    /*
     tprint();
     printf("Accepted client %d, on socket %d\n", clts, (TEMP->sock));
+    */
     (TEMP->ID) = clts;
     // When accepted
     clt_add(clt_new(*TEMP));
@@ -29,9 +31,10 @@ int clt_accept()
     {
         if ((INCOMING_CLT->sock) < 0)
             break;
-
+        /*
         tprint();
         printf("Could not Accept() on socket %d, Tries left %d.", (INCOMING_CLT->sock), (5 - (error)));
+        */
         if (error < 5)
         {
             error++;
@@ -58,7 +61,9 @@ void *srvr_clt_handle(void *arg)
     }
     else
     {
+        /*
         tprintf("NULL Client");
+        */
     }
 
     if (info.THREAD == &CLIENT_THREAD[0])
@@ -92,7 +97,8 @@ int CLT_CNTRL_LOGI(clt_lnk *client)
     clt_lnk clt = *client;
     int MsgSize;
     char *Msg, MsgSizeString[5];
-    tprintf("Requesting Username.");
+    
+    //tprintf("Requesting Username.");
     send(clt->Client.sock, CMD_CLT_SND_USRN, 4, 0);
 
     recv(clt->Client.sock, MsgSizeString, 5, 0);
@@ -100,17 +106,17 @@ int CLT_CNTRL_LOGI(clt_lnk *client)
     MsgSize = FBSizeToInt( MsgSizeString);
     Msg = malloc(MsgSize * sizeof(char));
     recv(clt->Client.sock, Msg, MsgSize, 0);
-    tprint();
-    printf("Received Username : %s \n",Msg);
+    //tprint();
+    //printf("Received Username : %s \n",Msg);
 
     send(clt->Client.sock, CMD_CLT_SND_PSWD,4 , 0);
-    tprintf("Requesting Password.");
+    //tprintf("Requesting Password.");
     recv(clt->Client.sock, MsgSizeString, 5, 0);
     checkerr((MsgSize = FBSizeToInt(MsgSizeString)), "Could Not Load Size Into an int");
     Msg = calloc(MsgSize, sizeof(char));
     recv(clt->Client.sock, Msg, MsgSize, 0);
-    tprint();
-    printf("Received Password : %s \n",Msg);
+    //tprint();
+    //printf("Received Password : %s \n",Msg);
 
     send(clt->Client.sock, CMD_CONN_CONF, 4,0);
 
