@@ -1,6 +1,10 @@
+#pragma region STANDARD
 #include <stdlib.h>
 #include <ncurses.h>
+#include <menu.h>
+#include <features.h>
 #include <string.h>
+#include <stdarg.h>
 #include <unistd.h>
 #include <assert.h>
 #include <pthread.h>
@@ -12,17 +16,24 @@
 #include <sys/epoll.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <time.h>
+#pragma endregion
+
+#include "cmd/cmd.h"
+#include "cmd/help.h"
+#include "cmd/cnsle.h"
+#include "cmd/popup.h"
 
 #include "server/inis.h"
 #include "server/epoll.h"
-#include "server/cmd.h"
 #include "server/intrf.h"
-#include "main_defs.h"
-#include "misc.h"
+
 #include "client/clt_defs.h"
 #include "client/clt_cntrl.h"
 #include "client/clt_cmd.h"
 #include "client/clt_accs.h"
+
 #include "debug/debug.h"
 
-#include <time.h>
+#include "main_defs.h"
+#include "misc.h"

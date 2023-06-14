@@ -1,11 +1,16 @@
 #ifndef CLT_DEFS_H
 #define CLT_DEFS_H
-typedef struct client_info clt_inf;
+
+#include <sys/epoll.h>
+
+typedef struct client_info_t clt_inf;
 typedef struct client_links *clt_lnk;
 typedef struct client_links clt;
 typedef struct sockaddr_in *sa_in;
 
-struct client_info
+typedef struct usr_info_t usr_inf;
+
+struct client_info_t
 {
     FILE *file;
     int sock;
@@ -14,11 +19,22 @@ struct client_info
     struct sockaddr_in *addr;
 };
 
+struct usr_info_t
+{
+    int state;
+    char UUID[37];
+    char USRNM[65];
+    char PSWD[65];
+    // char KEY[256];
+};
+
 struct client_links
 {
     pthread_mutex_t MUTEX;
     int INDEX;
+    struct epoll_event epoll_ev;
     clt_inf Client;
+    usr_inf Account;
     clt_lnk left;
     clt_lnk right;
 };

@@ -14,8 +14,9 @@ void epoll_inis()
     INIS++;
 }
 
-void epoll_add(int sock, epoll_ev * ev){
-    if(epoll_ctl(epollfd, EPOLL_CTL_ADD, sock, ev) < 0 )
+void epoll_add(int sock, epoll_ev *ev)
+{
+    if (epoll_ctl(epollfd, EPOLL_CTL_ADD, sock, ev) < 0)
     {
         switch (errno)
         {
@@ -23,14 +24,15 @@ void epoll_add(int sock, epoll_ev * ev){
             epoll_del(sock, ev);
             epoll_add(sock, ev);
             break;
-        
+
         default:
-            checkerr(-1,"Could Not add Socket");
+            checkerr(-1, "Could Not add Socket");
             break;
         }
     }
 }
-void epoll_del(int sock, epoll_ev * ev){
+void epoll_del(int sock, epoll_ev *ev)
+{
     epoll_ctl(epollfd, EPOLL_CTL_DEL, sock, ev);
 }
 void epoll_load_fds()
@@ -40,9 +42,10 @@ void epoll_load_fds()
         n_fds = epoll_pwait(epollfd, evs, MAXEVENTS, 100, NULL);
     } while (n_fds == -1 && errno == EINTR);
 }
-void epoll_unload_fds(){
+void epoll_unload_fds()
+{
     free(evs);
-    evs = malloc(MAXEVENTS* sizeof(epoll_ev));
+    evs = malloc(MAXEVENTS * sizeof(epoll_ev));
 }
 
 int SetNonBlocking(int fd)

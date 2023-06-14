@@ -42,7 +42,7 @@ int clt_add(clt_lnk New_Client)
 {
     ev.events = EPOLLIN | EPOLLET;
     ev.data.fd = (New_Client->Client.sock);
-
+    New_Client->epoll_ev = ev;
     epoll_add((New_Client->Client.sock), &ev);
     send((New_Client->Client.sock), CMD_CONN_ACC, 4, 0);
     /// Recive GUID
@@ -53,7 +53,6 @@ int clt_add(clt_lnk New_Client)
     send((New_Client->Client.sock), CMD_CLT_SND_GUID, 4, 0);
     recv((New_Client->Client.sock), (New_Client->Client.GUID), 37, 0);
 
-
     pthread_mutex_unlock(&(New_Client->MUTEX));
 
     pthread_mutex_lock(&CURRENT_INFO_MUTEX);
@@ -63,8 +62,13 @@ int clt_add(clt_lnk New_Client)
     pthread_mutex_unlock(&CURRENT_INFO_MUTEX);
     send((New_Client->Client.sock), CMD_CONN_CONF, 4, 0);
     send((New_Client->Client.sock), CMD_CONN_MTH, 4, 0);
-    
-    mvprintw((MAX_Y -1 ), 0,"Completed Adding : Client %d With GUID : %s\n", (New_Client->Client.ID), (New_Client->Client.GUID));
+    char inf[256], own[128];
+    sprintf(inf, "Completed Adding with GUID : %s", (New_Client->Client.GUID));
+    sprintf(own, "Client:%d", (New_Client->Client.ID));
+    cnsle_print(own, inf);
+
+    New_Client->Account.state = -1;
+    strcpy(New_Client->Account.UUID, (NULL_CLIENT->Client.GUID));
     return re;
 }
 

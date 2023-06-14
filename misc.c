@@ -38,12 +38,24 @@ void tprintw(char *string)
 	tprint();
 	printw("%s\n", string);
 }
+char *zero_show(int x)
+{
+	if (x < 10)
+		return "0";
+	else
+		return "";
+}
+void tsprint(char *dest)
+{
+	TM Time = GT();
+	sprintf(dest, "%s%d-%s%d | %s%d:%s%d:%s%d", zero_show(Time.tm_mon), Time.tm_mon, zero_show(Time.tm_mday), Time.tm_mday, zero_show(Time.tm_hour), Time.tm_hour, zero_show(Time.tm_min), Time.tm_min, zero_show(Time.tm_sec), Time.tm_sec);
+}
 
 void checkerr(int res, char *MsgIfErr)
 {
 	if (res < 0)
 	{
-		teprintf(MsgIfErr);
+		cnsle_print_sys(MsgIfErr);
 		exit(EXIT_FAILURE);
 	}
 }
@@ -151,11 +163,6 @@ int strcmpi(const char *str1, const char *str2)
 void fscan(char *string)
 {
 	scanf("%[^\n]%*c", string);
-}
-
-void ChangeColor(COLOR Color)
-{
-	printf(Color);
 }
 
 int IsInAllowedChars(char c)

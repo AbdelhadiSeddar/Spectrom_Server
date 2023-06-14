@@ -20,6 +20,7 @@ extern void teprintf(char *string);
 extern void tcprintf(char *string);
 
 extern void twprint();
+extern void tsprint(char *dest);
 extern void tprintw(char *string);
 extern void tcprintw(char *string);
 
@@ -29,90 +30,23 @@ extern void tcprintw(char *string);
 extern void checkerr(int res, char *MsgIfErr);
 
 /// @brief Lower case a string
-/// @param res Resulting String 
+/// @param res Resulting String
 /// @param str Original String
-extern void strtolower(char* res,const char* str);
+extern void strtolower(char *res, const char *str);
 /// @brief Lower case a string
 /// @param strtolow String to Lowercase
-extern void strtolower_s(char* strtolow);
+extern void strtolower_s(char *strtolow);
 
-extern char* r_newline(char* str);
+extern char *r_newline(char *str);
 
 extern void fscan(char *string);
 
-extern int strcmpi (const char * str1, const char * str2 );
-
+extern int strcmpi(const char *str1, const char *str2);
 
 /// @brief Check Client's Username.
 /// @param Username ** Return The Username IF Existant
 /// @param ID
 /// @return  1 => Allowed Char |[]| 0 => Non-Allowed Char
-int IsInAllowedChars(char c)
-
-
-
-typedef char* COLOR;
-//Regular text
-
-
-//Regular bold text
-
-
-//Regular underline text
-#define U_BLK "\e[4;30m"
-#define U_RED "\e[4;31m"
-#define U_GRN "\e[4;32m"
-#define U_YEL "\e[4;33m"
-#define U_BLU "\e[4;34m"
-#define U_MAG "\e[4;35m"
-#define U_CYN "\e[4;36m"
-#define U_WHT "\e[4;37m"
-
-//Regular background
-#define BCK_BLK "\e[40m"
-#define BCK_RED "\e[41m"
-#define BCK_GRN "\e[42m"
-#define BCK_YEL "\e[43m"
-#define BCK_BLU "\e[44m"
-#define BCK_MAG "\e[45m"
-#define BCK_CYN "\e[46m"
-#define BCK_WHT "\e[47m"
-
-//High intensty background 
-#define HBCK_BLK "\e[0;100m"
-#define HBCK_RED "\e[0;101m"
-#define HBCK_GRN "\e[0;102m"
-#define HBCK_YEL "\e[0;103m"
-#define HBCK_BLU "\e[0;104m"
-#define HBCK_MAG "\e[0;105m"
-#define HBCK_CYN "\e[0;106m"
-#define HBCK_WHT "\e[0;107m"
-
-//High intensty text
-#define H_BLK "\e[0;90m"
-#define H_RED "\e[0;91m"
-#define H_GRN "\e[0;92m"
-#define H_YEL "\e[0;93m"
-#define H_BLU "\e[0;94m"
-#define H_MAG "\e[0;95m"
-#define H_CYN "\e[0;96m"
-#define H_WHT "\e[0;97m"
-
-//Bold high intensity text
-#define B_HBLK "\e[1;90m"
-#define B_HRED "\e[1;91m"
-#define B_HGRN "\e[1;92m"
-#define B_HYEL "\e[1;93m"
-#define B_HBLU "\e[1;94m"
-#define B_HMAG "\e[1;95m"
-#define B_HCYN "\e[1;96m"
-#define B_HWHT "\e[1;97m"
-
-//Reset
-#define reset "\e[0m"
-#define CRESET "\e[0m"
-#define COLOR_RESET "\e[0m"
-
-extern void ChangeColor(COLOR Color);
+int IsInAllowedChars(char c);
 
 #endif

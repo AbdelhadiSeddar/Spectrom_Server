@@ -2,13 +2,14 @@
 #define CMD_H
 
 typedef struct CMD_ARGS_t CMD_ARGS;
+extern CMD_ARGS *CMD;
 
 struct CMD_ARGS_t
 {
     char CMD[1024];
-    char *args;
+    char args[1024];
     unsigned int n_args;
-    char *v_args[10];
+    char *v_args[15];
 };
 extern void srvr_cmd();
 
@@ -20,9 +21,6 @@ extern void ShowCMD();
 
 extern void cmd_exit_app();
 extern void cmd_clear();
-
-extern void cmd_help();
-extern void cmd_help_exit_app();
 
 extern void get();
 
@@ -38,6 +36,7 @@ extern int ArgsAreNull();
 #define KEY_F12 20
 
 #define KEY_ENTR 10
+#define KEY_ESC 27
 #define KEY_DEL 7
 
 #endif

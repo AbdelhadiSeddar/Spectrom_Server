@@ -18,6 +18,7 @@ extern pthread_mutex_t SERVER_MUTEX;
 extern pthread_mutex_t CLIENT_MUTEX[2];
 extern struct sockaddr_in server_addr;
 
+extern char *r;
 extern clt_inf *INCOMING_CLT;
 extern unsigned int client_size;
 

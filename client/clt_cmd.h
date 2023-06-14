@@ -17,6 +17,8 @@
 #define CMD_CLT_SND_USRN "011" // Sending a request for the client's Username
 #define CMD_CLT_SND_PSWD "012" // Sending a request for the client's Password
 #define CMD_CLT_SND_MACA "013" // Sending a request for the client's MAC Adress !! Not Applicable !!
+#define CMD_CLT_SND_OK "01X"   // Sending That info gathred on previosu step is OK (Correct)
+#define CMD_CLT_SND_NO "01Y"   // Sending That info gathred on previosu step is NO (Incorrect)
 
 #define CMD_CLT_RCV_INFO "101" // Client requesting his account's info
 #define CMD_CLT_RCV_OINF "102" // Client requesting another account's info
