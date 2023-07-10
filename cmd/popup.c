@@ -91,26 +91,43 @@ int DefinePopup(int POPUP_STATUS, int POPUP_CODE, ...)
     _CODE = POPUP_CODE;
     __POPUP_STATUS = POPUP_STATUS;
     va_list POPUP_ARGS;
-    switch (POPUP_CODE)
+
+    switch (__POPUP_STATUS)
     {
-    case __POPUP_INFO_CODE_LOGWRITTEN:
-        __NPOPUP_ARGS = 1;
+    case __POPUP_STATUS_INFO:
+
+        /*          For INFO Status          */
+
+        switch (POPUP_CODE)
+        {
+        // special cases
+        case __POPUP_INFO_CODE_LOGWRITTEN:
+            __NPOPUP_ARGS = 1;
+            break;
+
+        // Normal cases
+        default:
+            __NPOPUP_ARGS = 0;
+            break;
+        }
+
+        if (__NPOPUP_ARGS)
+        {
+            __POPUP_ARGS = malloc(__NPOPUP_ARGS * sizeof(char **));
+            va_start(POPUP_ARGS, POPUP_CODE);
+            for (int i = 0; i < __NPOPUP_ARGS; i++)
+            {
+                __POPUP_ARGS[i] = calloc(128, sizeof(char *));
+                strcpy(__POPUP_ARGS[i], va_arg(POPUP_ARGS, char *));
+            }
+            va_end(POPUP_ARGS);
+        }
+
         break;
-    // special cases
+
     default:
         __NPOPUP_ARGS = 0;
         break;
-    }
-    if (__NPOPUP_ARGS)
-    {
-        __POPUP_ARGS = malloc(__NPOPUP_ARGS * sizeof(char **));
-        va_start(POPUP_ARGS, POPUP_CODE);
-        for (int i = 0; i < __NPOPUP_ARGS; i++)
-        {
-            __POPUP_ARGS[i] = calloc(128, sizeof(char *));
-            strcpy(__POPUP_ARGS[i], va_arg(POPUP_ARGS, char *));
-        }
-        va_end(POPUP_ARGS);
     }
 }
 
