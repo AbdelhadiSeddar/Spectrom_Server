@@ -30,8 +30,11 @@
 
 #include "client/clt_defs.h"
 #include "client/clt_cntrl.h"
-#include "client/clt_cmd.h"
 #include "client/clt_accs.h"
+
+#include "states/stt_acc.h"
+#include "states/stt_clt.h"
+#include "states/stt_conn.h"
 
 #include "debug/debug.h"
 

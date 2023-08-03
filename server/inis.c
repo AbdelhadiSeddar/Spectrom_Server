@@ -5,6 +5,7 @@ pthread_t SRVR_LSTN_THREAD;
 pthread_t CLIENT_THREAD[2];
 pthread_mutex_t SERVER_MUTEX;
 pthread_mutex_t CLIENT_MUTEX[2];
+
 struct sockaddr_in server_addr;
 
 clt_inf *INCOMING_CLT;
@@ -130,6 +131,8 @@ re:;
                         else if (CLIENTS_STATE != 0)
                             checkerr(-1, "Invalid CLIENT_STATE value");
                     }
+                    cnsle_print_sys("Locked Mutex");
+
                     break;
                 } while (1);
 

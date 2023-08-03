@@ -1,6 +1,9 @@
 #ifndef MISC_H
 #define MISC_H
 
+extern int snd(int sockfd, void *buf, size_t len, int flags);
+extern int rcv(int *sockfd, void *buf, size_t len, int flags);
+
 typedef struct tm TM;
 extern TM GT();
 

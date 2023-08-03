@@ -1,5 +1,50 @@
 #include "_Imports.h"
 
+void RESET_THREAD()
+{
+	int re;
+	if ((re = pthread_self()) == (int)SERVER_THREAD)
+		SERVER_STATE--;
+	else if (re == (int)(CLIENT_THREAD[0]))
+		CLIENTS_STATE--;
+	else if (re == (int)(CLIENT_THREAD[1]))
+		CLIENTS_STATE -= 10;
+}
+
+int snd(int sockfd, void *buf, size_t len, int flags)
+{
+	int re;
+	if ((re = send(sockfd, buf, len, MSG_NOSIGNAL | flags)) < 0)
+	{
+		buf = malloc(len * sizeof(char));
+		clt_lnk clt;
+		clt_find_local_sock(sockfd, &clt);
+		if (clt != NULL)
+			clt_disconnect(clt);
+		RESET_THREAD();
+		pthread_exit(0);
+	}
+
+	return re;
+}
+
+int rcv(int *sockfd, void *buf, size_t len, int flags)
+{
+	int re;
+	if ((re = recv(*sockfd, buf, len, flags)) <= 0)
+	{
+		clt_lnk clt;
+		clt_find_local_sock(*sockfd, &clt);
+		if (clt != NULL)
+			clt_disconnect(clt);
+
+		RESET_THREAD();
+		pthread_exit(0);
+	}
+
+	return re;
+}
+
 TM GT()
 {
 	time_t t = time(NULL);
@@ -55,7 +100,11 @@ void checkerr(int res, char *MsgIfErr)
 {
 	if (res < 0)
 	{
-		cnsle_print_sys(MsgIfErr);
+		debug_sys_cnsle_log();
+		endwin();
+		system("clear");
+		printf("Error : %s", MsgIfErr);
+
 		exit(EXIT_FAILURE);
 	}
 }

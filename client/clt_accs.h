@@ -29,11 +29,4 @@ extern int clt_check_id(int ID, char *Username);
 /// @return -1 => Wrong Un |[]|  0 => Existant |[]| 1 => Wrong Pw
 extern int clt_check(int sock, char *Username, char *Password, int *ID);
 
-/////////////////////////////////////   Logging /////////////////////////////////////
-
-extern int clt_log_in(int Index, char *Username, int ID, char *UUID);
-extern int clt_log_out(int Index);
-
-/////////////////////////////////////
-
 #endif

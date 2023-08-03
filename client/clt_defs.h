@@ -18,13 +18,13 @@ struct client_info_t
     char GUID[37];
     struct sockaddr_in *addr;
 };
-
+// States [ 0: Not Connected | 1: Connected ]
 struct usr_info_t
 {
     int state;
     char UUID[37];
-    char USRNM[65];
-    char PSWD[65];
+    char *USRNM;
+    char *PSWD;
     // char KEY[256];
 };
 
@@ -43,6 +43,14 @@ extern pthread_mutex_t CURRENT_INFO_MUTEX;
 extern int INIS;
 extern clt_lnk CLT_LIST;
 extern clt_lnk NULL_CLIENT;
+
+/// @brief Disconnects from a client but allow for reconnection
+/// @return 0 => Works as intended
+int clt_disconnect(clt_lnk clt);
+
+/// @brief Disconnects & Remove from the memory
+/// @return 0 => Works as intended
+int clt_remove(clt_lnk clt);
 
 /// @brief Initialise Client List
 /// @return -1 => Error |[]| 0 => Initialized.
@@ -89,9 +97,9 @@ extern int clt_find_local_sock(int sock, clt_lnk* New_Client);
 /// @param Client
 /// @return 0 => Client Found and Returned in *Client* parameter. |[]| -1 => Client Not Found.
 extern int clt_find_local_uuid(clt_lnk Tree, char *GUID, clt_lnk *Client);
-/*
-extern int clt_find_local_id(int ID, clt_lnk *New_Client);
 
+extern int clt_find_local_sock(int sockfd, clt_lnk *Client);
+/*
 //Deletion Functions
 // Returns :
 // 0 -> Success

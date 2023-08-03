@@ -1,5 +1,6 @@
 #include "../_Imports.h"
 int clts = 0;
+
 void *srvr_accept_clt(void *arg)
 {
     clt_inf *TEMP = clt_inf_clone((clt_inf *)arg);
@@ -46,44 +47,61 @@ void *srvr_clt_handle(void *arg)
     char GUID[37];
     clt_lnk clt;
     ST_T info = *(ST_T *)arg;
+
     epoll_del((info.SOCK), NULL);
-    recv(info.SOCK, GUID, 37, 0);
+    rcv(&(info.SOCK), GUID, 36, 0);
+    GUID[36] = '\0';
     checkerr(clt_find_local_uuid(NULL_CLIENT, GUID, &clt), "Could Not find USER");
-    if (clt != NULL)
+    if (clt == NULL)
     {
-        clt_handling(info, &clt);
+        if (info.THREAD == &CLIENT_THREAD[0])
+            CLIENTS_STATE--;
+        else
+            CLIENTS_STATE -= 10;
+        return NULL;
     }
-    else
-    {
-        cnsle_print_sys("NULL Client");
-    }
+
+    clt_handling(info, &clt);
 
     if (info.THREAD == &CLIENT_THREAD[0])
         CLIENTS_STATE--;
     else
         CLIENTS_STATE -= 10;
 
-    epoll_ev *ev = malloc(sizeof(epoll_ev));
-    ev->events = info.events;
-    epoll_add(info.SOCK, ev);
+    if (clt->Client.sock > server_sock)
+    {
+        epoll_ev *ev = malloc(sizeof(epoll_ev));
+        ev->events = info.events;
+        ev->data.fd = info.SOCK;
+        epoll_add(info.SOCK, ev);
+    }
     return NULL;
 }
 
 void clt_handling(ST_T INF, clt_lnk *clt)
 {
-    char rcv[4];
-    recv(INF.SOCK, rcv, 4, 0);
-    if ((rcv[1]) == '1')
+    char rciv[4];
+    rcv(&(INF.SOCK), rciv, 4, 0);
+    sleep(2);
+    switch (rciv[0])
     {
-        if (!strcmp(rcv, CMD_CLT_RCV_LOGI))
-            checkerr(CLT_CNTRL_LOGI(clt), "Error While Logging Client");
-        else if (!strcmp(rcv, CMD_CLT_RCV_LOGO))
-            checkerr(CLT_CNTRL_LOGO(clt), "Error While Un loggin Client");
-        else if (!strcmp(rcv, CMD_CONN_END))
+    case '0':
+        if (!strcmp(rciv, STT_CONN_END))
             checkerr(CLT_CNTRL_DISC(clt), "Error While Disconnecting a Client");
+        return;
+    case '1':
+        if (!strcmp(rciv, STT_CLT_RQST_LOGI))
+            checkerr(CLT_CNTRL_LOGI(clt), "Error While Logging a Client");
+        else if (!strcmp(rciv, STT_CLT_RQST_LOGO))
+            checkerr(CLT_CNTRL_LOGO(clt), "Error While logging out a Client");
+        return;
+    case '3':
+        if (!strcmp(rciv, STT_ACC_RQST_CONN))
+            checkerr(CLT_CNTRL_LOGI(clt), "Error While Logging Client");
+        return;
+    default:
+        break;
     }
-    else
-        checkerr(-1, "Client Sent Invalid Code");
 }
 
 int CLT_CNTRL_LOGI(clt_lnk *client)
@@ -91,28 +109,33 @@ int CLT_CNTRL_LOGI(clt_lnk *client)
     clt_lnk clt = *client;
     int MsgSize;
     char *Msg, MsgSizeString[5];
+    char *Acc, *indx;
+    int pos;
     char r[1024];
+    sprintf(r, "Client:%d", clt->Client.ID);
+    cnsle_print(r, " logging on ");
 
-    cnsle_print_sys("Requesting Username.");
-    send(clt->Client.sock, CMD_CLT_SND_USRN, 4, 0);
-    recv(clt->Client.sock, MsgSizeString, 5, 0);
+    rcv(&(clt->Client.sock), MsgSizeString, 5, 0);
     MsgSize = FBSizeToInt(MsgSizeString);
     Msg = malloc(MsgSize * sizeof(char));
-    recv(clt->Client.sock, Msg, MsgSize, 0);
-    sprintf(r, "Received Username : %s %d", Msg, MsgSize);
-    cnsle_print_sys(r);
-    strcpy(clt->Account.USRNM, Msg);
+    rcv(&(clt->Client.sock), Msg, MsgSize, 0);
 
-    send(clt->Client.sock, CMD_CLT_SND_PSWD, 4, 0);
-    cnsle_print_sys("Requesting Password.");
-    recv(clt->Client.sock, MsgSizeString, 5, 0);
-    checkerr((MsgSize = FBSizeToInt(MsgSizeString)), "Could Not Load Size Into an int");
-    Msg = calloc(MsgSize, sizeof(char));
-    recv(clt->Client.sock, Msg, MsgSize, 0);
-    sprintf(r, "Received Password : %s %d", Msg, MsgSize);
-    cnsle_print_sys(r);
-    send(clt->Client.sock, CMD_CONN_CONF, 4, 0);
+    if ((indx = strchr(Msg, '\n')) == NULL)
+        snd(clt->Client.sock, STT_ACC_INVR, 4, 0);
+    Acc = malloc((pos = (int)(indx - Msg)) * sizeof(char) + 1);
+    strncpy(Acc, Msg, pos);
+    Acc[pos] = '\0';
 
+    (clt->Account.USRNM) = Acc;
+
+    Acc = malloc((pos = strlen(indx + 1)) * sizeof(char) + 1);
+    strcpy(Acc, indx + 1);
+
+    (clt->Account.PSWD) = Acc;
+    (clt->Account.PSWD) = Acc;
+    (clt->Account.state) = 1;
+
+    snd(clt->Client.sock, STT_ACC_YES, 4, 0);
     return 0;
 }
 
@@ -125,25 +148,22 @@ int CLT_CNTRL_REGS(clt_lnk *client)
 int CLT_CNTRL_LOGO(clt_lnk *client)
 {
     clt_lnk clt = *client;
+    if (!(clt->Account.state))
+    {
+        snd(clt->Client.sock, STT_ACC_NCON, 4, 0);
+        return 0;
+    }
+
     usr_inf inf;
     clt->Account = inf;
-    send(clt->Client.sock, CMD_CONN_CONF, 4, 0);
-    send(clt->Client.sock, CMD_CONN_MTH, 4, 0);
+    snd(clt->Client.sock, STT_CLT_SND_OK, 4, 0);
     return 0;
 }
 
 int CLT_CNTRL_DISC(clt_lnk *client)
 {
-    clt_lnk clt = *client;
-    usr_inf inf;
-    clt->Account = inf;
-    epoll_del(clt->Client.sock, &(clt->epoll_ev));
-    send(clt->Client.sock, CMD_CONN_CONF, 4, 0);
-    close(clt->Client.sock);
-    clt->Client.sock = -1;
-    char cli[32];
-    sprintf(cli, "Client %d", (clt->Client.ID));
-    cnsle_print(cli, "Has Disconnected");
+    snd((*client)->Client.sock, STT_CONN_CONF, 4, 0);
+    clt_disconnect(*client);
 }
 
 clt_inf *clt_inf_clone(clt_inf *original)

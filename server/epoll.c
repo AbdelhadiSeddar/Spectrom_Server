@@ -39,7 +39,7 @@ void epoll_load_fds()
 {
     do
     {
-        n_fds = epoll_pwait(epollfd, evs, MAXEVENTS, 100, NULL);
+        n_fds = epoll_wait(epollfd, evs, MAXEVENTS, 10);
     } while (n_fds == -1 && errno == EINTR);
 }
 void epoll_unload_fds()
