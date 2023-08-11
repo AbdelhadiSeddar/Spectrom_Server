@@ -1,5 +1,5 @@
 # Releases
-All Releases are available [here](https://github.com/SamirChelfat/Spectrom_Server/releases)
+### All Releases are available [here](https://github.com/SamirChelfat/Spectrom_Server/releases)
 
 # About The Project
 This is a solo project for me [@SamirChelfat](https://github.com/SamirChelfat) Which Consists of Multiple Parts,
