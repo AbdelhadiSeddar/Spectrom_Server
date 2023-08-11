@@ -46,10 +46,15 @@ extern void fscan(char *string);
 
 extern int strcmpi(const char *str1, const char *str2);
 
-/// @brief Check Client's Username.
-/// @param Username ** Return The Username IF Existant
-/// @param ID
+/// @brief Checks if a Char is an allowed Character
+/// @param c 
 /// @return  1 => Allowed Char |[]| 0 => Non-Allowed Char
 int IsInAllowedChars(char c);
+/// @brief Checks if a Char is a valid Character
+/// @param c 
+/// @return  1 => valid Char |[]| 0 => Not a valid Char
+int IsValidChar(char c);
+
+int AddNUllChar(char *Str);
 
 #endif

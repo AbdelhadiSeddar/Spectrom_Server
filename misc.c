@@ -225,3 +225,21 @@ int IsInAllowedChars(char c)
 
 	return 0;
 }
+
+int AddNUllChar(char *Str)
+{
+	int nullpos= 0;
+	for(int i = 0; IsValidChar(Str[i]) && i < strlen(Str); i++)
+		nullpos = i;
+
+	Str[nullpos + 1 ] = '\0';
+	return nullpos;		
+}
+
+int IsValidChar(char c)
+{
+	if (c >= 0 && c <= 127)
+		return 1;
+
+	return 0;
+}

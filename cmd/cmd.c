@@ -11,19 +11,18 @@ void __reset_CMD()
     CMD->n_args = 0;
 }
 
+int curs, tot;
+char *cmd;
+
 void srvr_cmd()
 {
     scrn_inis();
-    // sleep(2);
 
-    char *cmd;
 e:;
     create_win_cmd();
-    // if (CMD != NULL) /* Debugging */
-    //     ShowCMD();
     cmd = malloc(1024 * sizeof(char));
     __reset_CMD();
-    int curs = 6, tot = 6;
+    curs = 6, tot = 6;
     char ch;
 
     wmove(COMMAND_WIN, 3, curs);
@@ -35,6 +34,11 @@ e:;
 
         ch = wgetch(COMMAND_WIN);
         wrefresh(COMMAND_WIN);
+        if(!IsValidChar(ch))
+        {
+            curs--;
+            break;
+        }
         if (ch == KEY_L)
             wmove(COMMAND_WIN, 3, (curs > 6 ? (curs -= 1) : (curs = 6)));
         else if (ch == KEY_R)
@@ -64,18 +68,19 @@ e:;
         wrefresh(COMMAND_WIN);
         refresh();
     }
-    cmd[curs - 6 + 1] = '\0';
+    AddNUllChar(cmd);
     GetCMD_s(cmd);
 cm:;
-
     ResolveCMD();
+    // if (CMD != NULL) /* Debugging */
+    //    ShowCMD();
     free(cmd);
     goto e;
 }
 
 void GetCMD_s(char *Origin)
 {
-    long unsigned int pos;
+    unsigned int pos;
     char *indx = strchr(Origin, ' ');
     if (indx == NULL)
         strcpy(CMD->CMD, Origin);
@@ -160,6 +165,10 @@ void cmd_clear()
 
 void ShowCMD()
 {
+    int nulll = 0;
+    for (int i = 0; cmd[i] != '\0'; i++)
+        nulll++;
+    mvprintw(3, 2, "Full Command: %s [ Curs %d Tot %d NULL at %d and %u  Valid : %d]\n", cmd, curs -6 +1, tot, nulll, cmd[1], IsValidChar(cmd[1]) );
     mvprintw(4, 2, "Command: %s (%d)\n", (CMD->CMD), strlen(CMD->CMD));
     refresh();
     mvprintw(5, 2, "N Args : %d\n", (CMD->n_args));
@@ -179,9 +188,6 @@ void cmd_exit_app()
     exit(0);
 }
 
-void get(char *args)
-{
-}
 
 int ArgsAreNull()
 {

@@ -10,7 +10,7 @@ void scrn_inis()
 	getmaxyx(stdscr, MAX_Y, MAX_X);
 	SetColors();
 	SetBckGrnd();
-
+	cbreak();
 	raw();
 	keypad(stdscr, TRUE);
 	noecho();
