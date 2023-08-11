@@ -2,6 +2,9 @@
 This is a solo project for me [@SamirChelfat](https://github.com/SamirChelfat) Which Consists of Multiple Parts,
 This project's goal is to make a Chatting System that utilizes All of Knowledges and try to improuve in them using Real Experience.
 
+# Releases
+All Releases are available [here](https://github.com/SamirChelfat/Spectrom_Server/releases)
+
 ### What I am trying to improuve are the following
  + ``` C ( and in the future C++ ) ``` : Multithreading, and better management of data, and making the best use of one's system capabilities, and better optimisation
  + ``` C# ``` : Improuvement in Desgining, and in WinForms, Overall just Making C# code with Better optimisation.
