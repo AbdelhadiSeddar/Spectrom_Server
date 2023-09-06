@@ -11,13 +11,14 @@ extern void *srvr_accept_clt(void *);
 extern void *srvr_clt_handle(void *);
 extern void clt_handling(ST_T, clt_lnk *);
 
-extern int clt_accept();
+extern int clt_accept(clt_inf **);
 
 extern int CLT_CNTRL_LOGI(clt_lnk *);
 extern int CLT_CNTRL_REGS(clt_lnk *);
 extern int CLT_CNTRL_LOGO(clt_lnk *);
 extern int CLT_CNTRL_DISC(clt_lnk *);
+extern int CLT_CNTRL_RCN(clt_lnk);
 
-clt_inf *clt_inf_clone(clt_inf *);
+clt_inf *clt_inf_clone(clt_inf *original);
 
 #endif

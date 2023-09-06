@@ -1,4 +1,5 @@
 #include "../_Imports.h"
+#include "cnsle.h"
 
 CNSLE_LINE _CONSOLE_LINES = NULL;
 CNSLE_LINE _C_CNSLE_LINE = NULL;
@@ -27,30 +28,40 @@ void cnsle_inis()
 CNSLE_LINE line;
 WINDOW *_CNSLE_SCRN = NULL;
 int _C_LINES;
-int LN;
+int LN = -1;
 
 void cnsle_write()
 {
     char t[64];
-    sprintf(t, "Clients: %d Client State: %d Server State %d", clts, CLIENTS_STATE, SERVER_STATE);
-    mvwprintw(TARGET_WIN, 2, (MAX_X - strlen(t)) / 2, t);
+    sprintf(t, "Clients: %d ", clts);
+    mvwprintw(TARGET_WIN, 2, (MAX_X - strlen(t)) / 2, "%s", t);
     wrefresh(TARGET_WIN);
 
-    if (LN != (_C_CNSLE_LINE->num))
+    line = _C_CNSLE_LINE;
+    for (int i = 0; line != NULL && i < (_C_LINES - 3); i++)
     {
-        line = _C_CNSLE_LINE;
-        for (int i = 0; line != NULL && i < (_C_LINES - 3); i++)
-        {
-            cnsle_printf(_C_LINES - 2 - i, 1, line);
-            line = line->PREV;
-        }
-        wrefresh(_CNSLE_SCRN);
+        cnsle_printf(_C_LINES - 2 - i, 1, line);
+        line = line->PREV;
+    }
+    wrefresh(_CNSLE_SCRN);
+}
+
+void cnsle_reset(int mode)
+{
+    if (mode)
+    {
+        clear();
+        cnsle_show();
+    }
+    else
+    {
+        cnsle_write();
     }
 }
 
 void cnsle_cntrl()
 {
-    nodelay(stdscr, TRUE);
+    nodelay(stdscr, FALSE);
     char r;
     while (1)
     {
@@ -89,14 +100,13 @@ void cnsle_cntrl()
 void cnsle()
 {
     if ((CMD->n_args) == 0 || ArgsAreNull())
-        cnsle_show();
+        cnsle_set();
     else
         debug_cmd_cnsle_log();
 }
 
 void cnsle_show()
 {
-    clear();
     wbkgdset(stdscr, COLOR_PAIR(B_CNSLE_HEADER));
     refresh();
     TARG_X = 0;
@@ -147,7 +157,7 @@ void cnsle_printf(int Y, int X, CNSLE_LINE line)
     mvwprintw(_CNSLE_SCRN, Y, X, "[");
 
     wattrset(_CNSLE_SCRN, COLOR_PAIR(B_CNSLE_PRINT_TIME));
-    mvwprintw(_CNSLE_SCRN, Y, X + 1, (line->time));
+    mvwprintw(_CNSLE_SCRN, Y, X + 1, "%s", (line->time));
 
     wattrset(_CNSLE_SCRN, COLOR_PAIR(B_CNSLE));
     mvwprintw(_CNSLE_SCRN, Y, (s += 1), "]");
@@ -159,13 +169,12 @@ void cnsle_printf(int Y, int X, CNSLE_LINE line)
     mvwprintw(_CNSLE_SCRN, Y, (s += 3 + strlen(line->origin)), "~$ ");
 
     wattrset(_CNSLE_SCRN, COLOR_PAIR(o == 0 ? B_CNSLE_PRINT_VAL_SYS : (o == -1 ? B_CNSLE_PRINT_VAL_ERR : B_CNSLE_PRINT_VAL_USR)));
-    mvwprintw(_CNSLE_SCRN, Y, (s += 3), (line->val));
+    mvwprintw(_CNSLE_SCRN, Y, (s += 3), "%s", (line->val));
 }
 
 int cnsle_print(char *owner, char *text)
 {
-    CONSOLE_LINE ln;
-    ln = malloc(sizeof(C_LINE));
+    CONSOLE_LINE ln = malloc(sizeof(C_LINE));
 
     tsprint(ln->time);
     strcpy((ln->val), text);
@@ -173,16 +182,13 @@ int cnsle_print(char *owner, char *text)
 
     ln->NXT = NULL;
 
-    while (1)
-    {
-        if (!pthread_mutex_lock(&_CONSOLE_MUTEX))
-            break;
-    }
+    pthread_mutex_lock(&_CONSOLE_MUTEX);
+
     ln->num = (_C_CNSLE_LINE->num) + 1;
     ln->PREV = _C_CNSLE_LINE;
     _C_CNSLE_LINE->NXT = ln;
     _C_CNSLE_LINE = ln;
     pthread_mutex_unlock(&_CONSOLE_MUTEX);
-
+    cnsle_write();
     return 0;
 }

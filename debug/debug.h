@@ -1,4 +1,4 @@
-#ifndef DEBUG_h
+#ifndef DEBUG_H
 #define DEBUG_H
 
 #define __CNSLE_LOG_CMD 0

@@ -81,8 +81,9 @@ void ShowPopupVal(int CODE)
         break;
     }
 
-    mvwprintw(_POPUP_WIN, 1, 1, __POPUP_VAL);
+    mvwprintw(_POPUP_WIN, 1, 1, "%s", __POPUP_VAL);
     wrefresh(_POPUP_WIN);
+    free(__POPUP_VAL);
 }
 
 int DefinePopup(int POPUP_STATUS, int POPUP_CODE, ...)
@@ -129,6 +130,7 @@ int DefinePopup(int POPUP_STATUS, int POPUP_CODE, ...)
         __NPOPUP_ARGS = 0;
         break;
     }
+    return 0;
 }
 
 int ShowPopup()

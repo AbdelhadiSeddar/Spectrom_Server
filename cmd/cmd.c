@@ -1,5 +1,6 @@
 #include "../_Imports.h"
 
+int nulll = 0;
 CMD_ARGS *CMD;
 
 void __reset_CMD()
@@ -17,11 +18,10 @@ char *cmd;
 void srvr_cmd()
 {
     scrn_inis();
-
 e:;
     create_win_cmd();
-    cmd = malloc(1024 * sizeof(char));
     __reset_CMD();
+    cmd = malloc(1024 * sizeof(char));
     curs = 6, tot = 6;
     char ch;
 
@@ -31,10 +31,10 @@ e:;
     {
         if (__POPUP_STATUS)
             ShowPopup();
-
-        ch = wgetch(COMMAND_WIN);
+        ch = getch();
+        
         wrefresh(COMMAND_WIN);
-        if(!IsValidChar(ch))
+        if (!IsValidChar(ch))
         {
             curs--;
             break;
@@ -68,14 +68,21 @@ e:;
         wrefresh(COMMAND_WIN);
         refresh();
     }
-    AddNUllChar(cmd);
+    cmd[curs - 6] = (char)0;
+    nulll = curs - 6;
     GetCMD_s(cmd);
 cm:;
     ResolveCMD();
-    // if (CMD != NULL) /* Debugging */
-    //    ShowCMD();
+    /// if (CMD != NULL) /* Show Command info for debugging*/
+    ///    ShowCMD();
     free(cmd);
-    goto e;
+    if (__SCRN_STATUS)
+        goto e;
+    else
+    {
+        endwin();
+        return;
+    }
 }
 
 void GetCMD_s(char *Origin)
@@ -92,7 +99,7 @@ void GetCMD_s(char *Origin)
 
     if (indx != NULL ? (strlen(Origin)) > strlen((char *)(indx + 1)) : 0)
     {
-        strcpy((CMD->args), (char *)(indx - 1));
+        strcpy((CMD->args), (char *)(indx + 1));
         GetArgs_s();
     }
     return;
@@ -103,24 +110,26 @@ void GetArgs_s()
 
     int s = 256, i = 0;
     unsigned int pos;
+    char *args = CMD->args;
     char *indx;
 
     (CMD->n_args) = 0;
     while (i < 10)
     {
-        indx = strchr(CMD->args, ' ');
+        indx = strchr(args, ' ');
         CMD->v_args[i] = malloc(s * sizeof(char));
+        (CMD->n_args)++;
         if (indx == NULL)
         {
-            strcpy(CMD->v_args[i], CMD->args);
+            strcpy(CMD->v_args[i], args);
             break;
         }
-        (CMD->n_args)++;
 
-        strncpy(CMD->v_args[i], CMD->args, (pos = (int)(indx - CMD->args)));
+        strncpy(CMD->v_args[i], args, (pos = (int)(indx - args)));
         CMD->v_args[i][pos] = '\0';
 
-        strcpy(CMD->args, (char *)(indx + 1));
+        args = (char *)(indx + 1);
+        i++;
     }
     if (i < 10)
         i++;
@@ -137,16 +146,17 @@ void ResolveCMD()
     }
 
     if (!strcmp((CMD->CMD), "clear") || !strcmp((CMD->CMD), "cls"))
-    {
         cmd_clear();
-        DefineInfo(__POPUP_INFO_CODE_CLEARED);
-    }
     else if (!strcmp((CMD->CMD), "exit") || !strcmp((CMD->CMD), "shutdown") || !strcmp((CMD->CMD), "stop"))
         cmd_exit_app();
     else if (!strcmp((CMD->CMD), "console") || !strcmp((CMD->CMD), "cnsle"))
         cnsle();
     else if (!strcmp((CMD->CMD), "help") || !strcmp((CMD->CMD), "?"))
         cmd_help();
+    else if (!strcmp((CMD->CMD), "show"))
+        cmd_show();
+    else if (!strcmp((CMD->CMD), "nofg") || !strcmp(CMD->CMD, "hide"))
+        __SCRN_OFF();
     else
         DefineError(__POPUP_ERR_CODE_INVALID);
 
@@ -160,22 +170,25 @@ void cmd_clear()
     delwin(S_COMMAND_WIN);
     ShowInf();
     refresh();
-    // DefineInfo(__POPUP_INFO_CODE_CLEARED);
 }
 
 void ShowCMD()
 {
-    int nulll = 0;
-    for (int i = 0; cmd[i] != '\0'; i++)
-        nulll++;
-    mvprintw(3, 2, "Full Command: %s [ Curs %d Tot %d NULL at %d and %u  Valid : %d]\n", cmd, curs -6 +1, tot, nulll, cmd[1], IsValidChar(cmd[1]) );
-    mvprintw(4, 2, "Command: %s (%d)\n", (CMD->CMD), strlen(CMD->CMD));
+    int Strlen = strlen(cmd);
+    for (int i = 0; i < Strlen; i++)
+    {
+
+        mvprintw(2, 2 + i * 10, "%c %u [] ", cmd[i], cmd[i]);
+    }
+    mvprintw(3, 2, "Full Command: %s [ Curs %d Tot %d NULL at %d and %u  Valid : %d]", cmd, curs - 6 + 1, tot - 6 + 1, nulll, cmd[nulll], IsValidChar(cmd[nulll]));
+    mvprintw(4, 2, "Command: %s (%lu)", (CMD->CMD), strlen(CMD->CMD));
     refresh();
-    mvprintw(5, 2, "N Args : %d\n", (CMD->n_args));
+    mvprintw(5, 2, "Args : %s", (CMD->args));
+    mvprintw(6, 2, "N Args : %d", (CMD->n_args));
     refresh();
     for (int i = 0; i < (CMD->n_args); i++)
     {
-        mvprintw(6 + i, 2, "Arg%d: - %s\n", i, (CMD->v_args[i]));
+        mvprintw(7 + i, 2, "Arg%d: - %s", i, (CMD->v_args[i]));
     }
 }
 
@@ -187,7 +200,6 @@ void cmd_exit_app()
     endwin();
     exit(0);
 }
-
 
 int ArgsAreNull()
 {

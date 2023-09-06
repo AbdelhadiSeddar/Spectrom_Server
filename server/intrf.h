@@ -17,9 +17,12 @@
 #define _C_TEXT_BLACK_GREEN 02
 #define _C_TEXT_WHITE_GREEN 72
 
+#define _C_TEXT_BLACK_BLUE 03
+#define _C_TEXT_GREEN_BLUE 23
 #define _C_TEXT_WHITE_BLUE 73
 
 #define _C_TEXT_BLACK_CYAN 06
+#define _C_TEXT_RED_CYAN 16
 #define _C_TEXT_GREEN_CYAN 26
 #define _C_TEXT_BLUE_CYAN 46
 
@@ -28,6 +31,7 @@
 #define _C_TEXT_GREEN_WHITE 27
 #define _C_TEXT_BLUE_WHITE 47
 #define _C_TEXT_MAGENTA_WHITE 57
+#define _C_TEXT_CYAN_WHITE 57
 #pragma endregion
 
 #pragma endregion BTN COLORS
@@ -101,7 +105,6 @@ extern void ShowInf();
 
 extern void create_win_cmd();
 extern void create_win_target(int Height, int Width, const char *Title, int BTN_TYPE, int BLC_BCK_GRN);
-#endif
 
 // COLOR_BLACK 0
 // COLOR_RED 1
@@ -111,3 +114,12 @@ extern void create_win_target(int Height, int Width, const char *Title, int BTN_
 // COLOR_MAGENTA 5
 // COLOR_CYAN 6
 // COLOR_WHITE 7
+typedef enum PROMPT_TYPE_t
+{
+    PROMPT_STRING,
+    PROMPT_INT
+} PROMPT_TYPE;
+extern void *PROMPT_RESULT;
+extern int win_target_prompt_data(PROMPT_TYPE Type);
+#endif
+

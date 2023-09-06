@@ -4,30 +4,29 @@ int clts = 0;
 void *srvr_accept_clt(void *arg)
 {
     clt_inf *TEMP = clt_inf_clone((clt_inf *)arg);
-
+    free(((clt_inf *)arg)->addr);
+    free((clt_inf *)arg);
     clts++;
 
     (TEMP->ID) = clts;
 
-    clt_add(clt_new(*TEMP));
+    clt_add(clt_new(TEMP));
 
     SERVER_STATE = !SERVER_STATE;
+    free(TEMP);
     return NULL;
 }
 
-int clt_accept()
+int clt_accept(clt_inf **INCOMING_CLT)
 {
-    if (INCOMING_CLT == NULL)
-    {
-        INCOMING_CLT = malloc(sizeof(clt_inf));
-        unsigned int client_size = sizeof(struct sockaddr_in);
-        (INCOMING_CLT->addr) = malloc((size_t)client_size);
-    }
+    clt_inf *CLT = malloc(sizeof(clt_inf));
+    unsigned int client_size = sizeof(struct sockaddr_in);
+    (CLT->addr) = malloc((size_t)client_size);
 
     int error = 0;
-    while (((INCOMING_CLT->sock) = accept(server_sock, (struct sockaddr *)&(INCOMING_CLT->addr), &client_size)) < 0)
+    while (((CLT->sock) = accept(server_sock, (struct sockaddr *)(CLT->addr), &client_size)) < 0)
     {
-        if ((INCOMING_CLT->sock) < 0)
+        if ((CLT->sock) < 0)
             break;
 
         if (error < 5)
@@ -39,6 +38,7 @@ int clt_accept()
             return -1;
         }
     }
+    *INCOMING_CLT = CLT;
     return 0;
 }
 
@@ -47,26 +47,18 @@ void *srvr_clt_handle(void *arg)
     char GUID[37];
     clt_lnk clt;
     ST_T info = *(ST_T *)arg;
-
+    free((ST_T *)arg);
     epoll_del((info.SOCK), NULL);
     rcv(&(info.SOCK), GUID, 36, 0);
     GUID[36] = '\0';
-    checkerr(clt_find_local_uuid(NULL_CLIENT, GUID, &clt), "Could Not find USER");
+    checkerr((clt = clt_find_local_uuid(NULL_CLIENT, GUID)) == NULL ? -1 : 0, "Could Not find USER");
     if (clt == NULL)
     {
-        if (info.THREAD == &CLIENT_THREAD[0])
-            CLIENTS_STATE--;
-        else
-            CLIENTS_STATE -= 10;
+        RESET_THREAD();
         return NULL;
     }
 
     clt_handling(info, &clt);
-
-    if (info.THREAD == &CLIENT_THREAD[0])
-        CLIENTS_STATE--;
-    else
-        CLIENTS_STATE -= 10;
 
     if (clt->Client.sock > server_sock)
     {
@@ -74,7 +66,9 @@ void *srvr_clt_handle(void *arg)
         ev->events = info.events;
         ev->data.fd = info.SOCK;
         epoll_add(info.SOCK, ev);
+        free(ev);
     }
+    RESET_THREAD();
     return NULL;
 }
 
@@ -104,6 +98,31 @@ void clt_handling(ST_T INF, clt_lnk *clt)
     }
 }
 
+int CLT_CNTRL_DISC(clt_lnk *client)
+{
+    return clt_disconnect(*client);
+}
+
+int CLT_CNTRL_RCN(clt_lnk client)
+{
+    char MsgSize[5];
+    char Str[1024];
+    snd(client->Client.sock, STT_CONN_RCN, 4, 0);
+    if (client->Account.state == _LOGGED)
+    {
+        snd(client->Client.sock, STT_ACC_ALR, 4, 0);
+        sprintf(Str, "%s\n%s", client->Account.UUID, client->Account.USRNM);
+        FByteSize(Str, MsgSize);
+        snd(client->Client.sock, MsgSize, 5, 0);
+        snd(client->Client.sock, Str, FBSizeToInt(MsgSize), 0);
+    }
+    else
+    {
+        snd(client->Client.sock, STT_ACC_NCON, 4, 0);
+    }
+    return 0;
+}
+
 int CLT_CNTRL_LOGI(clt_lnk *client)
 {
     clt_lnk clt = *client;
@@ -111,9 +130,6 @@ int CLT_CNTRL_LOGI(clt_lnk *client)
     char *Msg, MsgSizeString[5];
     char *Acc, *indx;
     int pos;
-    char r[1024];
-    sprintf(r, "Client:%d", clt->Client.ID);
-    cnsle_print(r, " logging on ");
 
     rcv(&(clt->Client.sock), MsgSizeString, 5, 0);
     MsgSize = FBSizeToInt(MsgSizeString);
@@ -125,26 +141,28 @@ int CLT_CNTRL_LOGI(clt_lnk *client)
     Acc = malloc((pos = (int)(indx - Msg)) * sizeof(char) + 1);
     strncpy(Acc, Msg, pos);
     Acc[pos] = '\0';
+    clt->Account.USRNM = malloc(strlen(Acc) * sizeof(char) + 1);
+    strcpy(clt->Account.USRNM, Acc);
 
-    (clt->Account.USRNM) = Acc;
-
+    free(Acc);
     Acc = malloc((pos = strlen(indx + 1)) * sizeof(char) + 1);
     strcpy(Acc, indx + 1);
 
-    (clt->Account.PSWD) = Acc;
-    (clt->Account.PSWD) = Acc;
-    (clt->Account.state) = 1;
+    clt->Account.PSWD = malloc(strlen(Acc) * sizeof(char) + 1);
+    strcpy(clt->Account.PSWD, Acc);
+    free(Acc);
+
+    (clt->Account.state) = _LOGGED;
 
     snd(clt->Client.sock, STT_ACC_YES, 4, 0);
+    free(Msg);
     return 0;
 }
-
 int CLT_CNTRL_REGS(clt_lnk *client)
 {
 
     return 0;
 }
-
 int CLT_CNTRL_LOGO(clt_lnk *client)
 {
     clt_lnk clt = *client;
@@ -160,24 +178,18 @@ int CLT_CNTRL_LOGO(clt_lnk *client)
     return 0;
 }
 
-int CLT_CNTRL_DISC(clt_lnk *client)
-{
-    snd((*client)->Client.sock, STT_CONN_CONF, 4, 0);
-    clt_disconnect(*client);
-}
-
 clt_inf *clt_inf_clone(clt_inf *original)
 {
     if (original == NULL)
         return NULL;
 
-    clt_inf *re = malloc(sizeof(clt_inf));
+    clt_inf *Return = malloc(sizeof(clt_inf));
 
-    (re->file) = (original->file);
-    (re->sock) = (original->sock);
-    (re->ID) = (original->ID);
-    (re->addr) = (original->addr);
-    strcpy((re->GUID), (original->GUID));
+    Return->file = (original->file);
+    Return->sock = (original->sock);
+    Return->ID = (original->ID);
+    Return->addr = (original->addr);
+    strcpy(Return->GUID, (original->GUID));
 
-    return re;
+    return Return;
 }

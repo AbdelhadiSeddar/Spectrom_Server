@@ -30,9 +30,11 @@ struct CNSLE_LINE_t
     CNSLE_LINE NXT;
 };
 extern pthread_mutex_t _CONSOLE_MUTEX;
-
+/// @brief Points to the start of the Console Lines List
 extern CNSLE_LINE _CONSOLE_LINES;
+/// @brief Points to the end of the Console Lines List
 extern CNSLE_LINE _C_CNSLE_LINE;
+extern WINDOW *_CNSLE_SCRN;
 
 extern void cnsle();
 

@@ -7,7 +7,7 @@ __HELP_INFO *_HELP_CMDS;
 
 void _DEFINE_HELP()
 {
-    n_HELP_CMDS = 4;
+    n_HELP_CMDS = 6;
     _HELP_CMDS = calloc(n_HELP_CMDS, sizeof(__HELP_INFO));
 
     // CLEAR
@@ -50,6 +50,29 @@ void _DEFINE_HELP()
     strcpy(_HELP_CMDS[3].aliases[0], "exit");
     strcpy(_HELP_CMDS[3].aliases[1], "shutdown");
     strcpy(_HELP_CMDS[3].aliases[2], "stop");
+
+    //  Show
+    strcpy(_HELP_CMDS[4].title, "Show");
+    _HELP_CMDS[4].n_formats = 4;
+    _HELP_CMDS[4].n_aliases = 1;
+    strcpy(_HELP_CMDS[4].format[0], "");
+    strcpy(_HELP_CMDS[4].format[1], "srvrinfo");
+    strcpy(_HELP_CMDS[4].format[2], "cltinfo");
+    strcpy(_HELP_CMDS[4].format[3], "cltinfo <ID>");
+    strcpy(_HELP_CMDS[4].format_INFO[0], "Shows Seerver/Clients Information");
+    strcpy(_HELP_CMDS[4].format_INFO[1], "Show Server Informations");
+    strcpy(_HELP_CMDS[4].format_INFO[2], "Shows the first Valid Client's Informations");
+    strcpy(_HELP_CMDS[4].format_INFO[3], "Show a Client's Informations");
+    strcpy(_HELP_CMDS[4].aliases[0], "show");
+
+    // No Forground
+    strcpy(_HELP_CMDS[5].title, "Hide");
+    _HELP_CMDS[5].n_formats = 1;
+    strcpy(_HELP_CMDS[5].format[0], "");
+    strcpy(_HELP_CMDS[5].format_INFO[0], "Hides the interface");
+    _HELP_CMDS[5].n_aliases = 2;
+    strcpy(_HELP_CMDS[5].aliases[0], "hide");  
+    strcpy(_HELP_CMDS[5].aliases[1], "nofg");  
 }
 
 void getOtherAliases(__HELP_INFO INF, const char *Excluded)
@@ -124,7 +147,7 @@ void __show_help_EMPT()
     }
 
     wattrset(TARGET_WIN, COLOR_PAIR(B_HELP_ALIAS));
-    mvwprintw(TARGET_WIN, height - 3, 2, CMD->CMD);
+    mvwprintw(TARGET_WIN, height - 3, 2, "%s", CMD->CMD);
     wattrset(TARGET_WIN, COLOR_PAIR(B_HELP_FORMAT));
     wprintw(TARGET_WIN, " %s", _HELP_CMDS[1].format[1]);
     wattrset(TARGET_WIN, COLOR_PAIR(B_HELP_INFO));
@@ -155,23 +178,26 @@ void __show_help_VALID(int HELP_INDEX)
     wattron(TARGET_WIN, COLOR_PAIR(_C_TEXT_BLUE_WHITE) | A_BOLD);
     mvwprintw(TARGET_WIN, 1, (width - strlen(" Command : ") - strlen(_HELP_CMDS[HELP_INDEX].title)) / 2, " Command : ");
     wattroff(TARGET_WIN, COLOR_PAIR(_C_TEXT_BLUE_WHITE) | A_BOLD);
-    wprintw(TARGET_WIN, _HELP_CMDS[HELP_INDEX].title);
+    wprintw(TARGET_WIN, "%s", _HELP_CMDS[HELP_INDEX].title);
 
     for (int i = 0; i < _HELP_CMDS[HELP_INDEX].n_formats; i++)
     {
         wattrset(TARGET_WIN, COLOR_PAIR(B_HELP_ALIAS));
-        mvwprintw(TARGET_WIN, 3 + i, 2, CMD->v_args[0]);
+        mvwprintw(TARGET_WIN, 3 + i, 2, "%s", CMD->v_args[0]);
         wattrset(TARGET_WIN, COLOR_PAIR(B_HELP_FORMAT));
         wprintw(TARGET_WIN, " %s", _HELP_CMDS[HELP_INDEX].format[i]);
         wattrset(TARGET_WIN, COLOR_PAIR(B_HELP_INFO));
         wprintw(TARGET_WIN, ": %s", _HELP_CMDS[HELP_INDEX].format_INFO[i]);
     }
 
+    if(_HELP_CMDS[HELP_INDEX].n_aliases == 1)
+        return;
+
     getOtherAliases(_HELP_CMDS[HELP_INDEX], CMD->v_args[0]);
     wattrset(TARGET_WIN, COLOR_PAIR(B_HELP_ALIASES_TEXT));
     mvwprintw(TARGET_WIN, height - 3, 2, "Aliases: ");
     wattrset(TARGET_WIN, COLOR_PAIR(B_HELP_ALIASES));
-    wprintw(TARGET_WIN, re);
+    wprintw(TARGET_WIN, "%s", re);
 }
 
 void cmd_help()
@@ -187,7 +213,6 @@ void cmd_help()
             __show_help_INVALID();
         else
             __show_help_VALID(indx);
-        printw("%d", indx);
     }
     refresh();
     wrefresh(TARGET_WIN);

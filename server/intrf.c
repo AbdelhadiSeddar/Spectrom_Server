@@ -1,6 +1,6 @@
 #include "../_Imports.h"
 
-int MAX_X, MAX_Y, COMWIN_X, COMWIN_Y, TARG_Y, TARG_X;
+int MAX_X, MAX_Y, COMWIN_X, COMWIN_Y, TARG_Y, TARG_X, TARG_Height, TARG_Width;
 WINDOW *COMMAND_WIN, *S_COMMAND_WIN, *TARGET_WIN, *S_TARGET_WIN;
 
 void scrn_inis()
@@ -10,7 +10,6 @@ void scrn_inis()
 	getmaxyx(stdscr, MAX_Y, MAX_X);
 	SetColors();
 	SetBckGrnd();
-	cbreak();
 	raw();
 	keypad(stdscr, TRUE);
 	noecho();
@@ -39,9 +38,9 @@ void SetColors()
 	/// START TEXT COLORS
 	init_pair(_C_TEXT_BLACK_BLACK, COLOR_BLACK, COLOR_BLACK);
 	init_pair(_C_TEXT_RED_BLACK, COLOR_RED, COLOR_BLACK);
-	init_pair(_C_TEXT_BLUE_BLACK, COLOR_BLUE, COLOR_BLACK);
 	init_pair(_C_TEXT_GREEN_BLACK, COLOR_GREEN, COLOR_BLACK);
 	init_pair(_C_TEXT_YELLOW_BLACK, COLOR_YELLOW, COLOR_BLACK);
+	init_pair(_C_TEXT_BLUE_BLACK, COLOR_BLUE, COLOR_BLACK);
 	init_pair(_C_TEXT_CYAN_BLACK, COLOR_CYAN, COLOR_BLACK);
 	init_pair(_C_TEXT_WHITE_BLACK, COLOR_WHITE, COLOR_BLACK);
 
@@ -50,9 +49,12 @@ void SetColors()
 	init_pair(_C_TEXT_BLACK_GREEN, COLOR_BLACK, COLOR_GREEN);
 	init_pair(_C_TEXT_WHITE_GREEN, COLOR_WHITE, COLOR_GREEN);
 
+	init_pair(_C_TEXT_BLACK_BLUE, COLOR_BLACK, COLOR_BLUE);
+	init_pair(_C_TEXT_GREEN_BLUE, COLOR_GREEN, COLOR_BLUE);
 	init_pair(_C_TEXT_WHITE_BLUE, COLOR_WHITE, COLOR_BLUE);
 
 	init_pair(_C_TEXT_BLACK_CYAN, COLOR_BLACK, COLOR_CYAN);
+	init_pair(_C_TEXT_RED_CYAN, COLOR_RED, COLOR_CYAN);
 	init_pair(_C_TEXT_GREEN_CYAN, COLOR_GREEN, COLOR_CYAN);
 	init_pair(_C_TEXT_BLUE_CYAN, COLOR_BLUE, COLOR_CYAN);
 
@@ -61,6 +63,7 @@ void SetColors()
 	init_pair(_C_TEXT_GREEN_WHITE, COLOR_GREEN, COLOR_WHITE);
 	init_pair(_C_TEXT_BLUE_WHITE, COLOR_BLUE, COLOR_WHITE);
 	init_pair(_C_TEXT_MAGENTA_WHITE, COLOR_MAGENTA, COLOR_WHITE);
+	init_pair(_C_TEXT_CYAN_WHITE, COLOR_CYAN, COLOR_WHITE);
 }
 
 void SetBckGrnd()
@@ -107,7 +110,8 @@ void destroy_win_cmd()
 
 void create_win_target(int Height, int Width, const char *Title, int BTN_TYPE, int BLC_BCK_GRN)
 {
-
+	TARG_Height = Height;
+	TARG_Width = Width;
 	if (!BLC_BCK_GRN)
 		S_TARGET_WIN = newwin(Height, Width, TARG_Y + 1, TARG_X + 1);
 	TARGET_WIN = newwin(Height, Width, TARG_Y, TARG_X);
@@ -115,10 +119,11 @@ void create_win_target(int Height, int Width, const char *Title, int BTN_TYPE, i
 	if (!BLC_BCK_GRN)
 		wbkgd(S_TARGET_WIN, COLOR_PAIR(SHADOW));
 
-	wbkgd(TARGET_WIN, COLOR_PAIR((BLC_BCK_GRN ? B_CNSLE_HEADER : B_BCKGRND_WIN)));
+	wbkgdset(TARGET_WIN, COLOR_PAIR((BLC_BCK_GRN ? B_CNSLE_HEADER : B_BCKGRND_WIN)));
+	wclear(TARGET_WIN);
 	box(TARGET_WIN, 0, 0);
 
-	mvwprintw(TARGET_WIN, 0, (Width - strlen(Title)) / 2, Title);
+	mvwprintw(TARGET_WIN, 0, (Width - strlen(Title)) / 2, "%s", Title);
 
 	switch (BTN_TYPE)
 	{
@@ -130,6 +135,9 @@ void create_win_target(int Height, int Width, const char *Title, int BTN_TYPE, i
 	case BTN_OK_CANCEL:
 		break;
 	case BTN_SUBMIT:
+		wattron(TARGET_WIN, COLOR_PAIR(SLCT));
+		mvwprintw(TARGET_WIN, Height - 2, (Width - strlen("< Submit >")) / 2, "< Submit >");
+		wattroff(TARGET_WIN, COLOR_PAIR(SLCT));
 		break;
 	case BTN_YES_NO:
 		break;
@@ -146,4 +154,82 @@ void create_win_target(int Height, int Width, const char *Title, int BTN_TYPE, i
 
 void destroy_win_target()
 {
+}
+void *PROMPT_RESULT;
+int win_target_prompt_data(PROMPT_TYPE Type)
+{
+	if (TARGET_WIN == NULL)
+		return 0;
+	int start_pos, curs, tot;
+	char ch, *input;
+	int input_length = TARG_Width * 0.75;
+	start_pos = (TARG_Width - input_length - 8) / 2;
+re:;
+
+	wattrset(TARGET_WIN, COLOR_PAIR(_C_TEXT_BLACK_CYAN));
+	mvwprintw(TARGET_WIN, TARG_Height - 2, start_pos - 1, " ");
+	for (int i = 0; i < input_length; i++)
+		mvwprintw(TARGET_WIN, TARG_Height - 2, start_pos + i, "_");
+
+	mvwprintw(TARGET_WIN, TARG_Height - 2, start_pos + input_length, " ");
+	wattrset(TARGET_WIN, COLOR_PAIR(B_BCKGRND_WIN));
+	wprintw(TARGET_WIN, " ");
+	wattrset(TARGET_WIN, COLOR_PAIR(_C_TEXT_WHITE_BLUE));
+	wprintw(TARGET_WIN, "< OK >");
+	refresh();
+	wrefresh(TARGET_WIN);
+	input = malloc(1024 * sizeof(char));
+	curs = (tot = start_pos);
+
+	wmove(TARGET_WIN, 3, curs);
+	refresh();
+	wattrset(TARGET_WIN, COLOR_PAIR(_C_TEXT_GREEN_CYAN) | A_UNDERLINE | A_DIM);
+	while (1)
+	{
+		ch = wgetch(TARGET_WIN);
+		wrefresh(TARGET_WIN);
+		if (ch == KEY_DEL && tot > start_pos)
+		{
+			curs--;
+			tot--;
+			wattrset(TARGET_WIN, COLOR_PAIR(_C_TEXT_BLACK_CYAN));
+			mvwprintw(TARGET_WIN, TARG_Height - 2, curs, "_");
+			wattrset(TARGET_WIN, COLOR_PAIR(_C_TEXT_GREEN_CYAN) | A_UNDERLINE | A_DIM);
+			input[curs - start_pos] = ' ';
+		}
+		else if (ch == KEY_ENTR)
+			break;
+		else if (ch == KEY_F12)
+		{
+			free(input);
+			goto re;
+		}
+		else if (Type == PROMPT_INT ? IsANumber(ch) : IsInAllowedChars((ch)))
+		{
+			mvwprintw(TARGET_WIN, TARG_Height - 2, curs, "%c", ch);
+			input[curs - start_pos] = ch;
+
+			curs++;
+			tot += (tot <= curs ? 1 : 0);
+		}
+
+		wrefresh(TARGET_WIN);
+		refresh();
+	}
+	input[curs - start_pos] = 0;
+	switch (Type)
+	{
+	case PROMPT_STRING:
+		PROMPT_RESULT = (void *)input;
+		return 1;
+		break;
+	case PROMPT_INT:
+		PROMPT_RESULT = (void *)malloc(sizeof(int));
+		*((int *)PROMPT_RESULT) = StringToInt(input);
+		return 1;
+	default:
+		PROMPT_RESULT = NULL;
+		return 0;
+		break;
+	}
 }

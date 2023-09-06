@@ -11,6 +11,7 @@ typedef struct __HELP_INFO_t
     char aliases[10][32];
 } __HELP_INFO;
 typedef __HELP_INFO *_HELP_CMD;
+extern __HELP_INFO *_HELP_CMDS;
 
 extern void _DEFINE_HELP();
 

@@ -37,6 +37,6 @@ extern int ArgsAreNull();
 
 #define KEY_ENTR 10
 #define KEY_ESC 27
-#define KEY_DEL 7
+#define KEY_DEL 127
 
 #endif

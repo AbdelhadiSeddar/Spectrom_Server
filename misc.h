@@ -1,6 +1,8 @@
 #ifndef MISC_H
 #define MISC_H
 
+extern void RESET_THREAD(void);
+
 extern int snd(int sockfd, void *buf, size_t len, int flags);
 extern int rcv(int *sockfd, void *buf, size_t len, int flags);
 
@@ -16,13 +18,14 @@ extern void FByteSize(char *string, char *Re_Size);
 /// @param FBSize Size on string.
 /// @return Size in int.
 extern int FBSizeToInt(char *FBSize);
+#define StringToInt(StringInt) FBSizeToInt(StringInt)
 
 extern void tprint();
 extern void tprintf(char *string);
 extern void teprintf(char *string);
 extern void tcprintf(char *string);
 
-extern void twprint();
+extern void twprinw(WINDOW *WIN);
 extern void tsprint(char *dest);
 extern void tprintw(char *string);
 extern void tcprintw(char *string);
@@ -47,14 +50,17 @@ extern void fscan(char *string);
 extern int strcmpi(const char *str1, const char *str2);
 
 /// @brief Checks if a Char is an allowed Character
-/// @param c 
+/// @param c Character to check
 /// @return  1 => Allowed Char |[]| 0 => Non-Allowed Char
-int IsInAllowedChars(char c);
+extern int IsInAllowedChars(char c);
+/// @brief Checks if a Char represents a number
+/// @param c Character to check
+/// @return 1 => valid Number |[]| 0 => Not a valid Number
+extern int IsANumber(char c);
 /// @brief Checks if a Char is a valid Character
-/// @param c 
+/// @param c Character to check
 /// @return  1 => valid Char |[]| 0 => Not a valid Char
-int IsValidChar(char c);
+extern int IsValidChar(char c);
 
-int AddNUllChar(char *Str);
 
 #endif

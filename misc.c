@@ -1,14 +1,15 @@
 #include "_Imports.h"
+#include "misc.h"
 
-void RESET_THREAD()
+void RESET_THREAD(void)
 {
 	int re;
 	if ((re = pthread_self()) == (int)SERVER_THREAD)
-		SERVER_STATE--;
+		_Update_Server_S(_NotUsed);
 	else if (re == (int)(CLIENT_THREAD[0]))
-		CLIENTS_STATE--;
+		_Update_Client_S(0, _NotUsed);
 	else if (re == (int)(CLIENT_THREAD[1]))
-		CLIENTS_STATE -= 10;
+		_Update_Client_S(1, _NotUsed);
 }
 
 int snd(int sockfd, void *buf, size_t len, int flags)
@@ -37,7 +38,6 @@ int rcv(int *sockfd, void *buf, size_t len, int flags)
 		clt_find_local_sock(*sockfd, &clt);
 		if (clt != NULL)
 			clt_disconnect(clt);
-
 		RESET_THREAD();
 		pthread_exit(0);
 	}
@@ -73,11 +73,6 @@ void tcprintw(char *string)
 {
 	printw("]=======$ %s\n", string);
 }
-void twprint()
-{
-	TM Time = GT();
-	printw("[ %d-%d | %d:%d:%d ]\t", Time.tm_mon, Time.tm_mday, Time.tm_hour, Time.tm_min, Time.tm_sec);
-}
 void tprintw(char *string)
 {
 	tprint();
@@ -90,6 +85,11 @@ char *zero_show(int x)
 	else
 		return "";
 }
+void twprinw(WINDOW * WIN)
+{
+	TM Time = GT();
+	wprintw(WIN, "%s%d-%s%d | %s%d:%s%d:%s%d", zero_show(Time.tm_mon), Time.tm_mon, zero_show(Time.tm_mday), Time.tm_mday, zero_show(Time.tm_hour), Time.tm_hour, zero_show(Time.tm_min), Time.tm_min, zero_show(Time.tm_sec), Time.tm_sec);
+}
 void tsprint(char *dest)
 {
 	TM Time = GT();
@@ -100,10 +100,22 @@ void checkerr(int res, char *MsgIfErr)
 {
 	if (res < 0)
 	{
+		cnsle_print_err(MsgIfErr);
+		cnsle_print_sys("Client Infos : ");
+		char Str[512];
+		sprintf(Str, "	Client Count: %d", clts);
+		cnsle_print_sys(Str);
+		sprintf(Str, "	Server State: %d [] Clients State: N/A", SERVER_STATE);
+		cnsle_print_sys(Str);
+		char Time[120];
+		tsprint(Time);
+		sprintf(Str, "Time of Stoppage %s", Time);
+		cnsle_print_sys(Str);
+
 		debug_sys_cnsle_log();
 		endwin();
 		system("clear");
-		printf("Error : %s", MsgIfErr);
+		printf("Error : %s\n", MsgIfErr);
 
 		exit(EXIT_FAILURE);
 	}
@@ -111,14 +123,7 @@ void checkerr(int res, char *MsgIfErr)
 
 void FByteSize(char *string, char *Re_Size)
 {
-	char re[5];
-	char *check = string;
-	int count = 0;
-	while (*check != '\0')
-	{
-		count++;
-		check++;
-	}
+	int count = strlen(string) + 1;
 	if (count <= 9)
 	{
 		sprintf(Re_Size, "000%d", count);
@@ -225,15 +230,11 @@ int IsInAllowedChars(char c)
 
 	return 0;
 }
-
-int AddNUllChar(char *Str)
+int IsANumber(char c)
 {
-	int nullpos= 0;
-	for(int i = 0; IsValidChar(Str[i]) && i < strlen(Str); i++)
-		nullpos = i;
-
-	Str[nullpos + 1 ] = '\0';
-	return nullpos;		
+	if (c >= 48 && c <= 57)
+		return 1;
+    return 0;
 }
 
 int IsValidChar(char c)

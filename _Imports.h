@@ -1,5 +1,6 @@
 #pragma region STANDARD
 #include <stdlib.h>
+#include <stdio.h>
 #include <ncurses.h>
 #include <menu.h>
 #include <features.h>
@@ -23,6 +24,7 @@
 #include "cmd/help.h"
 #include "cmd/cnsle.h"
 #include "cmd/popup.h"
+#include "cmd/show.h"
 
 #include "server/inis.h"
 #include "server/epoll.h"

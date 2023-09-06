@@ -41,11 +41,11 @@ void debug_cnsle_log_c(int __TYPE)
             DefineError(__POPUP_ERR_CODE_INVALID_ARG);
 
         if (CMD->n_args == 2 && CMD->v_args[1] != NULL && (!strcmp(CMD->v_args[1], " ") || !strcmp(CMD->v_args[1], "")))
-            sprintf(__PATH_LOG, _PATH_LOG);
+            sprintf(__PATH_LOG, "%s", _PATH_LOG);
         else if (CMD->n_args == 1)
-            sprintf(__PATH_LOG, _PATH_LOG);
+            sprintf(__PATH_LOG, "%s", _PATH_LOG);
         else
-            sprintf(__PATH_LOG, (CMD->v_args[1]));
+            sprintf(__PATH_LOG, "%s", (CMD->v_args[1]));
 
         break;
     case __CNSLE_LOG_SYS:

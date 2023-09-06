@@ -1,5 +1,4 @@
 #ifndef CLT_ACCS_H
-
 #define CLT_ACCS_H
 
 /////////////////////////////////////   Checks  /////////////////////////////////////
@@ -26,7 +25,7 @@ extern int clt_check_id(int ID, char *Username);
 /// @param Username
 /// @param Password
 /// @param ID ** Return ID IF Existant
-/// @return -1 => Wrong Un |[]|  0 => Existant |[]| 1 => Wrong Pw
+/// @return -1 => Wrong Username |[]|  0 => Accepted |[]| 1 => Wrong Password
 extern int clt_check(int sock, char *Username, char *Password, int *ID);
 
 #endif
