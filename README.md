@@ -6,7 +6,7 @@ This is a solo project for me [@SamirChelfat](https://github.com/SamirChelfat) W
 This project's goal is to make a Chatting System that utilizes All of Knowledges and try to improuve in them using Real Experience.
 
 ### What I am trying to improuve are the following
- + ``` C ( and in the future C++ ) ``` : Multithreading, and better management of data, and making the best use of one's system capabilities, and better optimisation
+ + ``` C ``` : Multithreading, and better management of data, and making the best use of one's system capabilities, and better optimisation
  + ``` C# ``` : Improuvement in Desgining, and in WinForms, Overall just Making C# code with Better optimisation.
  X ``` Blazor ```: Blazor will not be implement due it it being too slow and hardware demanding, the appropriate langue to replace the latter has yet to be decided.
 
