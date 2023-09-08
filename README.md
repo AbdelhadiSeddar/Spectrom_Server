@@ -12,7 +12,7 @@ This project's goal is to make a Chatting System that utilizes All of Knowledges
 
 ## ``` Server Side ```
 
-> + A C (Possibly will be change in the future to C++) based Server application [This Project](https://github.com/SamirChelfat/Spectrom_Server) 
+> + A C based Server application [This Project](https://github.com/SamirChelfat/Spectrom_Server) 
 
 ## ``` Client Side ```
 
