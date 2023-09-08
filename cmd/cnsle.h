@@ -35,6 +35,7 @@ extern CNSLE_LINE _CONSOLE_LINES;
 /// @brief Points to the end of the Console Lines List
 extern CNSLE_LINE _C_CNSLE_LINE;
 extern WINDOW *_CNSLE_SCRN;
+extern int _IS_CNSLE_ACTIVE;
 
 extern void cnsle();
 

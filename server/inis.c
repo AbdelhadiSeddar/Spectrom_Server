@@ -120,7 +120,7 @@ void _Update_Client_S(int _Client_Thread, int _Status)
 
     CLIENT_STATES[_Client_Thread] = _Status;
 
-    if (__SCRN_STATUS && _CNSLE_SCRN)
+    if (__SCRN_STATUS && _IS_CNSLE_ACTIVE)
         cnsle_update();
     return;
 }
@@ -128,7 +128,7 @@ void _Update_Server_S(int _Status)
 {
     SERVER_STATE = _Status;
 
-    if (__SCRN_STATUS && _CNSLE_SCRN)
+    if (__SCRN_STATUS && _IS_CNSLE_ACTIVE)
         cnsle_update();
     return;
 }

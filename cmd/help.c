@@ -1,14 +1,14 @@
 #include "../_Imports.h"
 
 int height, width;
-int n_HELP_CMDS = 0;
+int _n_CMDS = 0;
 char *re;
 __HELP_INFO *_HELP_CMDS;
 
 void _DEFINE_HELP()
 {
-    n_HELP_CMDS = 6;
-    _HELP_CMDS = calloc(n_HELP_CMDS, sizeof(__HELP_INFO));
+    _n_CMDS = 6;
+    _HELP_CMDS = calloc(_n_CMDS, sizeof(__HELP_INFO));
 
     // CLEAR
     strcpy(_HELP_CMDS[0].title, "Clear");
@@ -18,28 +18,32 @@ void _DEFINE_HELP()
     _HELP_CMDS[0].n_aliases = 2;
     strcpy(_HELP_CMDS[0].aliases[0], "clear");
     strcpy(_HELP_CMDS[0].aliases[1], "cls");
+    _HELP_CMDS_f_def(0) = &cmd_clear;
+    
 
     // Help
     strcpy(_HELP_CMDS[1].title, "Help");
     _HELP_CMDS[1].n_formats = 2;
     strcpy(_HELP_CMDS[1].format[0], "");
-    strcpy(_HELP_CMDS[1].format_INFO[0], "Shows this menu");
     strcpy(_HELP_CMDS[1].format[1], "<Command>");
+    strcpy(_HELP_CMDS[1].format_INFO[0], "Shows this menu");
     strcpy(_HELP_CMDS[1].format_INFO[1], "Shows help for a certain Command");
     _HELP_CMDS[1].n_aliases = 2;
     strcpy(_HELP_CMDS[1].aliases[0], "help");
     strcpy(_HELP_CMDS[1].aliases[1], "?");
+    _HELP_CMDS_f_def(1) = &cmd_help;
 
     // // Console
     strcpy(_HELP_CMDS[2].title, "Console");
     _HELP_CMDS[2].n_formats = 2;
     strcpy(_HELP_CMDS[2].format[0], "");
-    strcpy(_HELP_CMDS[2].format_INFO[0], "Shows The console window");
     strcpy(_HELP_CMDS[2].format[1], "log [Optional: <PATH>]");
+    strcpy(_HELP_CMDS[2].format_INFO[0], "Shows The console window");
     strcpy(_HELP_CMDS[2].format_INFO[1], "Saves the console in a log file ( default path _PATH_LOG )");
     _HELP_CMDS[2].n_aliases = 2;
     strcpy(_HELP_CMDS[2].aliases[0], "console");
     strcpy(_HELP_CMDS[2].aliases[1], "cnsle");
+    _HELP_CMDS_f_def(2) = &cnsle;
 
     // EXIT
     strcpy(_HELP_CMDS[3].title, "Exit");
@@ -50,6 +54,7 @@ void _DEFINE_HELP()
     strcpy(_HELP_CMDS[3].aliases[0], "exit");
     strcpy(_HELP_CMDS[3].aliases[1], "shutdown");
     strcpy(_HELP_CMDS[3].aliases[2], "stop");
+    _HELP_CMDS_f_def(3) = &cmd_exit_app;
 
     //  Show
     strcpy(_HELP_CMDS[4].title, "Show");
@@ -64,6 +69,7 @@ void _DEFINE_HELP()
     strcpy(_HELP_CMDS[4].format_INFO[2], "Shows the first Valid Client's Informations");
     strcpy(_HELP_CMDS[4].format_INFO[3], "Show a Client's Informations");
     strcpy(_HELP_CMDS[4].aliases[0], "show");
+    _HELP_CMDS_f_def(4) = &cmd_show;
 
     // No Forground
     strcpy(_HELP_CMDS[5].title, "Hide");
@@ -73,16 +79,16 @@ void _DEFINE_HELP()
     _HELP_CMDS[5].n_aliases = 2;
     strcpy(_HELP_CMDS[5].aliases[0], "hide");  
     strcpy(_HELP_CMDS[5].aliases[1], "nofg");  
+    _HELP_CMDS_f_def(5) = &__SCRN_OFF;
 }
 
 void getOtherAliases(__HELP_INFO INF, const char *Excluded)
 {
-    if (!re)
+    if(re)
         free(re);
-
-    re = malloc(sizeof(char) * 1024);
+    re = calloc(sizeof(char), 1024);
     for (int i = 0; i < INF.n_aliases; i++)
-        if (strcmp(INF.aliases[i], Excluded) != 0)
+        if (strcmp(INF.aliases[i], Excluded))
         {
             strcat(re, INF.aliases[i]);
             strcat(re, " ");
@@ -101,7 +107,7 @@ int findlongestcmd()
     int max = 0;
     int ifremax;
     int remax = (strlen(_HELP_CMDS[max].format[0]) + strlen(_HELP_CMDS[max].format_INFO[0]));
-    for (int i = 1; i < n_HELP_CMDS; i++)
+    for (int i = 1; i < _n_CMDS; i++)
         if ((ifremax = strlen(_HELP_CMDS[i].format[0]) + strlen(_HELP_CMDS[i].format_INFO[0])) > remax)
         {
             max = i;
@@ -117,7 +123,7 @@ int _HELP_CMD_ISVALID()
 {
     char re[1024];
     cnsle_print(_CNSLE_ERROR, "Check Start");
-    for (int i = 0; i < n_HELP_CMDS; i++)
+    for (int i = 0; i < _n_CMDS; i++)
     {
         for (int u = 0; u < _HELP_CMDS[i].n_aliases; u++)
             if (!strcmp(_HELP_CMDS[i].aliases[u], CMD->v_args[0]))
@@ -129,12 +135,12 @@ int _HELP_CMD_ISVALID()
 void __show_help_EMPT()
 {
     width = 8 + findlongestcmd();
-    height = 6 + n_HELP_CMDS;
+    height = 6 + _n_CMDS;
     TARG_X = (MAX_X - width) / 2;
     TARG_Y = (MAX_Y - height) / 2;
 
     create_win_target(height, width, "[ Help ]", BTN_OK, 0);
-    for (int i = 0; i < n_HELP_CMDS; i++)
+    for (int i = 0; i < _n_CMDS; i++)
     {
         wattrset(TARGET_WIN, COLOR_PAIR(B_BCKGRND_WIN));
         mvwprintw(TARGET_WIN, 2 + i, 2, "- [");
@@ -194,7 +200,7 @@ void __show_help_VALID(int HELP_INDEX)
         return;
 
     getOtherAliases(_HELP_CMDS[HELP_INDEX], CMD->v_args[0]);
-    wattrset(TARGET_WIN, COLOR_PAIR(B_HELP_ALIASES_TEXT));
+    wattrset(TARGET_WIN, COLOR_PAIR(B_HELP_ALIASES_TEXT) | A_BOLD);
     mvwprintw(TARGET_WIN, height - 3, 2, "Aliases: ");
     wattrset(TARGET_WIN, COLOR_PAIR(B_HELP_ALIASES));
     wprintw(TARGET_WIN, "%s", re);

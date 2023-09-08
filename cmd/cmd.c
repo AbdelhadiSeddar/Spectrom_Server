@@ -6,8 +6,11 @@ CMD_ARGS *CMD;
 void __reset_CMD()
 {
     if (CMD != NULL)
+    {
+        for(int i = 0 ; i < CMD -> n_args; i++)
+            free(CMD ->v_args[i]);
         free(CMD);
-
+    }
     CMD = malloc(sizeof(CMD_ARGS));
     CMD->n_args = 0;
 }
@@ -32,7 +35,7 @@ e:;
         if (__POPUP_STATUS)
             ShowPopup();
         ch = getch();
-        
+
         wrefresh(COMMAND_WIN);
         if (!IsValidChar(ch))
         {
@@ -117,7 +120,7 @@ void GetArgs_s()
     while (i < 10)
     {
         indx = strchr(args, ' ');
-        CMD->v_args[i] = malloc(s * sizeof(char));
+        CMD->v_args[i] = calloc(s, sizeof(char));
         (CMD->n_args)++;
         if (indx == NULL)
         {
@@ -145,21 +148,15 @@ void ResolveCMD()
         return;
     }
 
-    if (!strcmp((CMD->CMD), "clear") || !strcmp((CMD->CMD), "cls"))
-        cmd_clear();
-    else if (!strcmp((CMD->CMD), "exit") || !strcmp((CMD->CMD), "shutdown") || !strcmp((CMD->CMD), "stop"))
-        cmd_exit_app();
-    else if (!strcmp((CMD->CMD), "console") || !strcmp((CMD->CMD), "cnsle"))
-        cnsle();
-    else if (!strcmp((CMD->CMD), "help") || !strcmp((CMD->CMD), "?"))
-        cmd_help();
-    else if (!strcmp((CMD->CMD), "show"))
-        cmd_show();
-    else if (!strcmp((CMD->CMD), "nofg") || !strcmp(CMD->CMD, "hide"))
-        __SCRN_OFF();
-    else
-        DefineError(__POPUP_ERR_CODE_INVALID);
-
+    for (int cmd = 0; cmd < _n_CMDS; cmd++)
+        for (int alia = 0; alia < _HELP_CMDS[cmd].n_aliases; alia++)
+            if (!strcmp((CMD->CMD), _HELP_CMDS[cmd].aliases[alia]))
+            {
+                _HELP_CMDS_f(cmd);
+                goto EndResolve;
+            }
+    DefineError(__POPUP_ERR_CODE_INVALID);
+EndResolve:;
     cmd_clear();
 }
 

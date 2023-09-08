@@ -168,6 +168,9 @@ void HidePopup()
 {
     __POPUP_STATUS = 0;
     _CODE = 0;
+    for (int i = 0; i < __NPOPUP_ARGS; i++)
+        free(__POPUP_ARGS[i]);
+    free(__POPUP_ARGS);
     refresh();
     if (_POPUP_WIN != NULL)
     {

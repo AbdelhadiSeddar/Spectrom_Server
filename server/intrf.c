@@ -75,7 +75,7 @@ void SetBckGrnd()
 
 void create_win_cmd()
 {
-
+	_IS_CNSLE_ACTIVE = 0;
 	COMWIN_X = (MAX_X - 54) / 2;
 	COMWIN_Y = (MAX_Y - 8) / 2;
 	S_COMMAND_WIN = newwin(8, 54, COMWIN_Y + 1, COMWIN_X + 1);
@@ -161,11 +161,12 @@ int win_target_prompt_data(PROMPT_TYPE Type)
 	if (TARGET_WIN == NULL)
 		return 0;
 	int start_pos, curs, tot;
-	char ch, *input;
+	char ch, *input = NULL;
 	int input_length = TARG_Width * 0.75;
 	start_pos = (TARG_Width - input_length - 8) / 2;
 re:;
-
+	if (input)
+		free(input);
 	wattrset(TARGET_WIN, COLOR_PAIR(_C_TEXT_BLACK_CYAN));
 	mvwprintw(TARGET_WIN, TARG_Height - 2, start_pos - 1, " ");
 	for (int i = 0; i < input_length; i++)
@@ -178,7 +179,7 @@ re:;
 	wprintw(TARGET_WIN, "< OK >");
 	refresh();
 	wrefresh(TARGET_WIN);
-	input = malloc(1024 * sizeof(char));
+	input = calloc(1024, sizeof(char));
 	curs = (tot = start_pos);
 
 	wmove(TARGET_WIN, 3, curs);
@@ -204,7 +205,7 @@ re:;
 			free(input);
 			goto re;
 		}
-		else if (Type == PROMPT_INT ? IsANumber(ch) : IsInAllowedChars((ch)))
+		else if ( (Type == PROMPT_INT ? IsANumber(ch) : IsInAllowedChars((ch)) ) && curs <= input_length+1 )
 		{
 			mvwprintw(TARGET_WIN, TARG_Height - 2, curs, "%c", ch);
 			input[curs - start_pos] = ch;
@@ -226,8 +227,10 @@ re:;
 	case PROMPT_INT:
 		PROMPT_RESULT = (void *)malloc(sizeof(int));
 		*((int *)PROMPT_RESULT) = StringToInt(input);
+		free(input);
 		return 1;
 	default:
+		free(input);
 		PROMPT_RESULT = NULL;
 		return 0;
 		break;

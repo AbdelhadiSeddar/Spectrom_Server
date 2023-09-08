@@ -29,6 +29,7 @@ void __debug_cnsle_log()
 
     fclose(f);
     DefineInfo(__POPUP_INFO_CODE_LOGWRITTEN, __PATH_LOG);
+    free(__PATH_LOG);
 }
 
 void debug_cnsle_log_c(int __TYPE)

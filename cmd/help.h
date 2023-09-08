@@ -1,8 +1,12 @@
 #ifndef HELP_H
 #define HELP_H
 
+extern int _n_CMDS;
 typedef struct __HELP_INFO_t
 {
+    void (*f)();
+#define _HELP_CMDS_f(CMDNum) (*_HELP_CMDS[CMDNum].f)()
+#define _HELP_CMDS_f_def(CMDNum) _HELP_CMDS[CMDNum].f
     int n_formats;
     int n_aliases;
     char title[64];

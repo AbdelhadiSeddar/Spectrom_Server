@@ -29,6 +29,7 @@ CNSLE_LINE line;
 WINDOW *_CNSLE_SCRN = NULL;
 int _C_LINES;
 int LN = -1;
+int _IS_CNSLE_ACTIVE = 0;
 
 void cnsle_write()
 {
@@ -50,6 +51,7 @@ void cnsle_reset(int mode)
 {
     if (mode)
     {
+        _IS_CNSLE_ACTIVE = 1;
         clear();
         cnsle_show();
     }
@@ -83,6 +85,7 @@ void cnsle_cntrl()
             case KEY_U:
                 break;
             case KEY_ESC:
+                _IS_CNSLE_ACTIVE = 0;
                 delwin(_CNSLE_SCRN);
                 clear();
                 nodelay(stdscr, FALSE);
@@ -94,7 +97,6 @@ void cnsle_cntrl()
             }
         refresh();
     }
-    nodelay(stdscr, FALSE);
 }
 
 void cnsle()
@@ -189,6 +191,7 @@ int cnsle_print(char *owner, char *text)
     _C_CNSLE_LINE->NXT = ln;
     _C_CNSLE_LINE = ln;
     pthread_mutex_unlock(&_CONSOLE_MUTEX);
-    cnsle_write();
+    if (_IS_CNSLE_ACTIVE)
+        cnsle_write();
     return 0;
 }
