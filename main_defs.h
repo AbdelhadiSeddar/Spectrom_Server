@@ -8,6 +8,8 @@
 #define MAXEVENTS 2048
 #define PORT 9114
 
+#define UNIT_SEPARATOR (char)31
+
 
 #define __SCRN_SHOWN 1
 #define __SCRN_NOTSHOWN 0

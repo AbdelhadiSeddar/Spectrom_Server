@@ -76,7 +76,6 @@ void clt_handling(ST_T INF, clt_lnk *clt)
 {
     char rciv[4];
     rcv(&(INF.SOCK), rciv, 4, 0);
-    sleep(2);
     switch (rciv[0])
     {
     case '0':
@@ -88,6 +87,8 @@ void clt_handling(ST_T INF, clt_lnk *clt)
             checkerr(CLT_CNTRL_LOGI(clt), "Error While Logging a Client");
         else if (!strcmp(rciv, STT_CLT_RQST_LOGO))
             checkerr(CLT_CNTRL_LOGO(clt), "Error While logging out a Client");
+        else if (!strcmp(rciv, STT_CLT_RQST_REGS))
+            checkerr(CLT_CNTRL_REGS(clt), "Error While registering an Account");
         return;
     case '3':
         if (!strcmp(rciv, STT_ACC_RQST_CONN))
@@ -136,16 +137,19 @@ int CLT_CNTRL_LOGI(clt_lnk *client)
     Msg = malloc(MsgSize * sizeof(char));
     rcv(&(clt->Client.sock), Msg, MsgSize, 0);
 
-    if ((indx = strchr(Msg, '\n')) == NULL)
+    if ((indx = strchr(Msg, UNIT_SEPARATOR)) == NULL)
+    {
         snd(clt->Client.sock, STT_ACC_INVR, 4, 0);
-    Acc = malloc((pos = (int)(indx - Msg)) * sizeof(char) + 1);
+        return 0;
+    }
+    Acc = calloc((pos = (int)(indx - Msg)) + 1, sizeof(char));
     strncpy(Acc, Msg, pos);
     Acc[pos] = '\0';
-    clt->Account.USRNM = malloc(strlen(Acc) * sizeof(char) + 1);
+    clt->Account.USRNM = calloc(strlen(Acc) + 1, sizeof(char));
     strcpy(clt->Account.USRNM, Acc);
 
     free(Acc);
-    Acc = malloc((pos = strlen(indx + 1)) * sizeof(char) + 1);
+    Acc = calloc((pos = strlen(indx + 1) + 1), sizeof(char));
     strcpy(Acc, indx + 1);
 
     clt->Account.PSWD = malloc(strlen(Acc) * sizeof(char) + 1);
@@ -158,11 +162,101 @@ int CLT_CNTRL_LOGI(clt_lnk *client)
     free(Msg);
     return 0;
 }
+
+#define W_FNAME 1
+#define W_LNAME 2
+#define W_EMAIL 4
 int CLT_CNTRL_REGS(clt_lnk *client)
 {
+    clt_lnk clt = *client;
+    char *Msg, *Msg_R, MsgSizeString[5], *indx, *temp;
+    int MsgSize, pos;
 
+    rcv(&(clt->Client.sock), MsgSizeString, 5, 0);
+    MsgSize = FBSizeToInt(MsgSizeString);
+    Msg = malloc(MsgSize * sizeof(char));
+    Msg_R = Msg;
+    rcv(&(clt->Client.sock), Msg_R, MsgSize, 0);
+
+    if ((indx = strchr(Msg_R, UNIT_SEPARATOR)) == NULL)
+    {
+        snd(clt->Client.sock, STT_ACC_INVR, 4, 0);
+        return 0;
+    }
+
+    temp = calloc((pos = (int)(indx - Msg_R)) + 1, sizeof(char));
+    strncpy(temp, Msg_R, pos);
+    temp[pos] = '\0';
+    // Temp now == Username
+
+    Msg_R = (char *)(indx + 1);
+    if ((indx = strchr(Msg_R, UNIT_SEPARATOR)) == NULL)
+    {
+        snd(clt->Client.sock, STT_ACC_INVR, 4, 0);
+        return 0;
+    }
+    temp = calloc((pos = (int)(indx - Msg_R)) + 1, sizeof(char));
+    strncpy(temp, Msg_R, pos);
+    temp[pos] = '\0';
+    // Temp now == Passsword
+
+    Msg_R = (char *)(indx + 1);
+    if ( Msg_R[0] == '\0')
+    {
+        snd(clt->Client.sock, STT_ACC_INVF, 4, 0);
+        return 0;
+    }
+    //  Get the registeration format
+    int Regs_format;
+    temp = calloc(2, sizeof(char));
+    strncpy(temp, Msg_R, 1);
+    temp[1] = '\0';
+    Regs_format = StringToInt(temp);
+
+    if (Regs_format & W_FNAME)
+    {
+        Msg_R = (char *)(indx + 1);
+        if ((indx = strchr(Msg_R, UNIT_SEPARATOR)) == NULL)
+        {
+            snd(clt->Client.sock, STT_ACC_INVF, 4, 0);
+            return 0;
+        }
+        temp = calloc((pos = (int)(indx - Msg_R)) + 1, sizeof(char));
+        strncpy(temp, Msg_R, pos);
+        temp[pos] = '\0';
+        // Temp now == First Name
+    }
+    if (Regs_format & W_LNAME)
+    {
+        Msg_R = (char *)(indx + 1);
+        if ((indx = strchr(Msg_R, UNIT_SEPARATOR)) == NULL)
+        {
+            snd(clt->Client.sock, STT_ACC_INVF, 4, 0);
+            return 0;
+        }
+        temp = calloc((pos = (int)(indx - Msg_R)) + 1, sizeof(char));
+        strncpy(temp, Msg_R, pos);
+        temp[pos] = '\0';
+        // Temp now == Last Name
+    }
+    if (Regs_format & W_EMAIL)
+    {
+        Msg_R = (char *)(indx + 1);
+        if ((indx = strchr(Msg_R, UNIT_SEPARATOR)) == NULL)
+        {
+            snd(clt->Client.sock, STT_ACC_INVF, 4, 0);
+            return 0;
+        }
+        temp = calloc((pos = (int)(indx - Msg_R)) + 1, sizeof(char));
+        strncpy(temp, Msg_R, pos);
+        temp[pos] = '\0';
+        // Temp now == Email
+    }
+
+    snd(clt->Client.sock, STT_ACC_YES, 4, 0);
     return 0;
 }
+
 int CLT_CNTRL_LOGO(clt_lnk *client)
 {
     clt_lnk clt = *client;

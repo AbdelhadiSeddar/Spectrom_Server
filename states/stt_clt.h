@@ -35,6 +35,6 @@
 #define STT_CLT_RQST_LOGI "120" // Client Requesting to login
 #define STT_CLT_RQST_LOGO "121" // Client Requesting to logout
 #define STT_CLT_RQST_REGS "123" // Client Requesting to register an account.
-#define STT_CLT_RQST_REMV "124" // Client Requesting to register an account.
+#define STT_CLT_RQST_REMV "124" // Client Requesting to remove their account.
 
 #endif

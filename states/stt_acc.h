@@ -21,6 +21,9 @@
 #define STT_ACC_INVP "311" //   Invalid Password
 #define STT_ACC_INV2 "312" //   Invalid 2FA Code
 #define STT_ACC_INVR "313" //   Invalid Request
+#define STT_ACC_INVF "314" //   Invalid Format
+#define STT_ACC_UNMU "315" //   Unavailable Username (Taken)
+
 
 #define STT_ACC_RQST_CONN "320" // Client Requesting Login
 #define STT_ACC_RQST_FUNM "321" // Client Requesting Username Recovery

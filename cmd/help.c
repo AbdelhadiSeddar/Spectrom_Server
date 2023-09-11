@@ -64,7 +64,7 @@ void _DEFINE_HELP()
     strcpy(_HELP_CMDS[4].format[1], "srvrinfo");
     strcpy(_HELP_CMDS[4].format[2], "cltinfo");
     strcpy(_HELP_CMDS[4].format[3], "cltinfo <ID>");
-    strcpy(_HELP_CMDS[4].format_INFO[0], "Shows Seerver/Clients Information");
+    strcpy(_HELP_CMDS[4].format_INFO[0], "Shows Server/Clients Information");
     strcpy(_HELP_CMDS[4].format_INFO[1], "Show Server Informations");
     strcpy(_HELP_CMDS[4].format_INFO[2], "Shows the first Valid Client's Informations");
     strcpy(_HELP_CMDS[4].format_INFO[3], "Show a Client's Informations");
