@@ -14,9 +14,9 @@ int clt_inis()
     CLT_LIST = NULL_CLIENT;
     strcpy((NULL_CLIENT->Client.GUID), "00000000-0000-0000-0000-000000000000");
     int sock = -1;
-    NULL_CLIENT ->Client.addr = NULL;
-    NULL_CLIENT ->Client.ID = 0;
-    NULL_CLIENT ->INDEX = 0;
+    NULL_CLIENT->Client.addr = NULL;
+    NULL_CLIENT->Client.ID = 0;
+    NULL_CLIENT->INDEX = 0;
 
     NULL_CLIENT->left = NULL;
     NULL_CLIENT->right = NULL;
@@ -88,23 +88,26 @@ int clt_add(clt_lnk New_Client)
         free(New_Client);
         return 1;
     }
-    else
-    {
-        pthread_mutex_lock(&CURRENT_INFO_MUTEX);
-        checkerr(clt_add_R(NULL_CLIENT, New_Client), "Error While adding");
 
-        pthread_mutex_unlock(&CURRENT_INFO_MUTEX);
-        snd((New_Client->Client.sock), STT_CONN_CONF, 4, 0);
-        snd((New_Client->Client.sock), STT_CONN_MTH, 4, 0);
-        char own[128];
-        sprintf(own, "Client:%d", (New_Client->Client.ID));
-        cnsle_print(own, "Logged in");
+    pthread_mutex_lock(&CURRENT_INFO_MUTEX);
+    checkerr(clt_add_R(NULL_CLIENT, New_Client), "Error While adding");
 
-        New_Client->Account.state = _NOTLOGGED;
-        strcpy(New_Client->Account.UUID, (NULL_CLIENT->Client.GUID));
+    pthread_mutex_unlock(&CURRENT_INFO_MUTEX);
+    snd((New_Client->Client.sock), STT_CONN_CONF, 4, 0);
+    snd((New_Client->Client.sock), STT_CONN_MTH, 4, 0);
+    char own[128];
+    sprintf(own, "Client:%d", (New_Client->Client.ID));
+    cnsle_print(own, "Logged in");
 
-        return 0;
-    }
+    CLT_LIST->next = New_Client;
+    New_Client -> prev = CLT_LIST;
+    New_Client -> next = NULL;
+    CLT_LIST = New_Client;
+
+    New_Client->Account.state = _NOTLOGGED;
+    strcpy(New_Client->Account.UUID, (NULL_CLIENT->Client.GUID));
+
+    return 0;
 }
 
 int clt_add_R(clt_lnk Tree, clt_lnk NewClient)

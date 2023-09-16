@@ -14,8 +14,8 @@ void Exec_ArgResolv(int argc, char **argv)
 
 int main(int argc, char **argv)
 {
-    cnsle_inis();
 
+    cnsle_inis();
     pthread_mutex_init(&(__SCRN_MUTEX), NULL);
     Exec_ArgResolv(argc, argv);
 
@@ -24,9 +24,9 @@ int main(int argc, char **argv)
     char _SCRN;
     size_t _Len = 32;
 re:;
-    if(!__SCRN_STATUS)
+    if (!__SCRN_STATUS)
         _SCRN = getchar();
-        
+
     __SCRN_ON();
     srvr_cmd();
     goto re;

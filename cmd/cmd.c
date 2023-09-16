@@ -7,8 +7,8 @@ void __reset_CMD()
 {
     if (CMD != NULL)
     {
-        for(int i = 0 ; i < CMD -> n_args; i++)
-            free(CMD ->v_args[i]);
+        for (int i = 0; i < CMD->n_args; i++)
+            free(CMD->v_args[i]);
         free(CMD);
     }
     CMD = malloc(sizeof(CMD_ARGS));

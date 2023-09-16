@@ -59,4 +59,13 @@ void _show_cltinfo_(int cltid)
         __show_nullclt();
     else
         __show_cltinfo(_clt);
+    char r;
+    while (1)
+    {
+        r = getch();
+        if (r == KEY_ENTR)
+        {
+            break;
+        }
+    }
 }

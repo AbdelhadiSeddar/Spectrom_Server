@@ -36,8 +36,12 @@ struct client_links
     struct epoll_event epoll_ev;
     clt_inf Client;
     usr_inf Account;
-    clt_lnk left;
-    clt_lnk right;
+    clt_lnk next;   // For Linked List Struct
+    clt_lnk prev;   // For Linked List Struct
+    
+    clt_lnk left;   // For Binary Tree Struct 
+    clt_lnk right;  // For Binary Tree Struct
+    
 };
 
 extern pthread_mutex_t CURRENT_INFO_MUTEX;

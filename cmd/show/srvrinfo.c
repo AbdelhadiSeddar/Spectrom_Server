@@ -61,4 +61,14 @@ void __show_srvrinfo()
 void _show_srvrinfo()
 {
     __show_srvrinfo();
+
+    char r;
+    while (1)
+    {
+        r = getch();
+        if (r == KEY_ENTR)
+        {
+            break;
+        }
+    }
 }

@@ -23,12 +23,13 @@
 #include "cmd/cmd.h"
 #include "cmd/help.h"
 #include "cmd/cnsle.h"
-#include "cmd/popup.h"
 #include "cmd/show.h"
 
 #include "server/inis.h"
 #include "server/epoll.h"
 #include "server/intrf.h"
+#include "server/intrf/popup.h"
+#include "server/intrf/alertbox.h"
 
 #include "client/clt_defs.h"
 #include "client/clt_cntrl.h"

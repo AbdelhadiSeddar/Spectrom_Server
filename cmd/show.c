@@ -1,13 +1,15 @@
 #include "../_Imports.h"
 #include "show/cltinfo.h"
+#include "show/cltlist.h"
 #include "show/srvrinfo.h"
 
 int show_width, show_height;
 /// @brief Amount of items show in _show()
-#define _ITEMS_AMOUNT 3
+#define _ITEMS_AMOUNT 4
 int _SHOW_ITEM_SELCT = -1;
 char *_SHOW_ITEMS[_ITEMS_AMOUNT] = {
     "Server Info (srvrinfo)",
+    "Clients List ( Lists all clients )",
     "Client Info (cltinfo) ( First valid )",
     "Client Info (cltinfo) ( Search with ID)"};
 
@@ -67,10 +69,12 @@ _refresh_show_:
         case '3':
             _SHOW_ITEM_SELCT = 2;
             goto _refresh_show_;
+        case '4':
+            _SHOW_ITEM_SELCT = 3;
+            goto _refresh_show_;
         case KEY_ESC:
             return 1;
         default:
-            //mvprintw(1, 1, "%c   %d", r, r);
             break;
         }
     }
@@ -85,10 +89,13 @@ void cmd_show()
     {
         if (!strcmp((CMD->v_args[0]), (_HELP_CMDS[4].format[1])))
             _show_srvrinfo();
-        else if (!strcmp((CMD->v_args[0]), (_HELP_CMDS[4].format[2])))
+        else if (!strcmp((CMD->v_args[0]), (_HELP_CMDS[4].format[2])) || !strcmp((CMD->v_args[0]), (_HELP_CMDS[4].format[3])))
+            _show_cltlist();
+        else if (!strcmp((CMD->v_args[0]), (_HELP_CMDS[4].format[5])))
             _show_cltinfo();
-        else if (_show())
-            return;
+        else
+            _show();
+        return;
     }
     else if (_show())
         return;
@@ -98,25 +105,17 @@ void cmd_show()
         _show_srvrinfo();
         break;
     case 1:
-        _show_cltinfo();
+        _show_cltlist();
         break;
     case 2:
+        _show_cltinfo();
+        break;
+    case 3:
         win_target_prompt_data(PROMPT_INT);
         _show_cltinfo_id(*((int *)PROMPT_RESULT));
         break;
-
     default:
         break;
-    }
-
-    char r;
-    while (1)
-    {
-        r = getch();
-        if (r == '\n')
-        {
-            break;
-        }
     }
     return;
 }

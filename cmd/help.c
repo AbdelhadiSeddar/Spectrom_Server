@@ -19,7 +19,6 @@ void _DEFINE_HELP()
     strcpy(_HELP_CMDS[0].aliases[0], "clear");
     strcpy(_HELP_CMDS[0].aliases[1], "cls");
     _HELP_CMDS_f_def(0) = &cmd_clear;
-    
 
     // Help
     strcpy(_HELP_CMDS[1].title, "Help");
@@ -58,16 +57,20 @@ void _DEFINE_HELP()
 
     //  Show
     strcpy(_HELP_CMDS[4].title, "Show");
-    _HELP_CMDS[4].n_formats = 4;
+    _HELP_CMDS[4].n_formats = 6;
     _HELP_CMDS[4].n_aliases = 1;
     strcpy(_HELP_CMDS[4].format[0], "");
     strcpy(_HELP_CMDS[4].format[1], "srvrinfo");
-    strcpy(_HELP_CMDS[4].format[2], "cltinfo");
-    strcpy(_HELP_CMDS[4].format[3], "cltinfo <ID>");
-    strcpy(_HELP_CMDS[4].format_INFO[0], "Shows Server/Clients Information");
-    strcpy(_HELP_CMDS[4].format_INFO[1], "Show Server Informations");
-    strcpy(_HELP_CMDS[4].format_INFO[2], "Shows the first Valid Client's Informations");
-    strcpy(_HELP_CMDS[4].format_INFO[3], "Show a Client's Informations");
+    strcpy(_HELP_CMDS[4].format[2], "clts");
+    strcpy(_HELP_CMDS[4].format[3], "cltlist");
+    strcpy(_HELP_CMDS[4].format[4], "cltinfo");
+    strcpy(_HELP_CMDS[4].format[5], "cltinfo <ID>");
+    strcpy(_HELP_CMDS[4].format_INFO[0], "Shows Server/Client(s) Information");
+    strcpy(_HELP_CMDS[4].format_INFO[1], "Shows Server Informations");
+    strcpy(_HELP_CMDS[4].format_INFO[2], "Shows a list of connected clients");
+    strcpy(_HELP_CMDS[4].format_INFO[3], "Shows a list of connected clients");
+    strcpy(_HELP_CMDS[4].format_INFO[4], "Shows the first Valid Client's Informations");
+    strcpy(_HELP_CMDS[4].format_INFO[5], "Shows a Client's Informations");
     strcpy(_HELP_CMDS[4].aliases[0], "show");
     _HELP_CMDS_f_def(4) = &cmd_show;
 
@@ -77,14 +80,14 @@ void _DEFINE_HELP()
     strcpy(_HELP_CMDS[5].format[0], "");
     strcpy(_HELP_CMDS[5].format_INFO[0], "Hides the interface");
     _HELP_CMDS[5].n_aliases = 2;
-    strcpy(_HELP_CMDS[5].aliases[0], "hide");  
-    strcpy(_HELP_CMDS[5].aliases[1], "nofg");  
+    strcpy(_HELP_CMDS[5].aliases[0], "hide");
+    strcpy(_HELP_CMDS[5].aliases[1], "nofg");
     _HELP_CMDS_f_def(5) = &__SCRN_OFF;
 }
 
 void getOtherAliases(__HELP_INFO INF, const char *Excluded)
 {
-    if(re)
+    if (re)
         free(re);
     re = calloc(sizeof(char), 1024);
     for (int i = 0; i < INF.n_aliases; i++)
@@ -160,17 +163,6 @@ void __show_help_EMPT()
     wprintw(TARGET_WIN, ": %s", _HELP_CMDS[1].format_INFO[1]);
 }
 
-void __show_help_INVALID()
-{
-    width = 6 + strlen(CMD->v_args[0]) + 20;
-    height = 6;
-    TARG_X = (MAX_X - width) / 2;
-    TARG_Y = (MAX_Y - height) / 2;
-
-    create_win_target(height, width, "[ Help ]", BTN_OK, 0);
-    mvwprintw(TARGET_WIN, 2, 2, "No help for \"%s\"", CMD->v_args[0]);
-}
-
 void __show_help_VALID(int HELP_INDEX)
 {
     int width = 8 + findlongestformat(CMD->v_args[0], HELP_INDEX);
@@ -196,7 +188,7 @@ void __show_help_VALID(int HELP_INDEX)
         wprintw(TARGET_WIN, ": %s", _HELP_CMDS[HELP_INDEX].format_INFO[i]);
     }
 
-    if(_HELP_CMDS[HELP_INDEX].n_aliases == 1)
+    if (_HELP_CMDS[HELP_INDEX].n_aliases == 1)
         return;
 
     getOtherAliases(_HELP_CMDS[HELP_INDEX], CMD->v_args[0]);
@@ -216,7 +208,7 @@ void cmd_help()
     else
     {
         if ((indx = _HELP_CMD_ISVALID()) < 0)
-            __show_help_INVALID();
+            alertbox(HelpNotFound, CMD->v_args[0]);
         else
             __show_help_VALID(indx);
     }
