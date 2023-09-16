@@ -6,9 +6,9 @@ This is a solo project for me [@SamirChelfat](https://github.com/SamirChelfat) W
 This project's goal is to make a Chatting System that utilizes All of Knowledges and try to improuve in them using Real Experience.
 
 ### What I am trying to improuve are the following
- + ``` C ``` : Multithreading, and better management of data, and making the best use of one's system capabilities, and better optimisation
- + ``` C# ``` : Improuvement in Desgining, and in WinForms, Overall just Making C# code with Better optimisation.
- X ``` Blazor ```: Blazor will not be implement due it it being too slow and hardware demanding, the appropriate langue to replace the latter has yet to be decided.
+ + ``` C ``` : Multithreading, improuvement in data management, learning of uses of C and it's capabilities and how to properly use them.
+ + ``` C# ``` : Improuvement in Desgining, learning more about WinForms, Overall learning about C# and how to write optimized code.
+ + ``` Web Developpement ```: Improuvement in designing, learning about web developement.
 
 ## ``` Server Side ```
 
@@ -17,5 +17,5 @@ This project's goal is to make a Chatting System that utilizes All of Knowledges
 ## ``` Client Side ```
 
 > +  A C# based Client for Windows Users [Project Link](https://github.com/SamirChelfat/Spectrom_WinClient) ( Currently Private )
-> +  A WebApplication for Universal utilization (Windows / Mac / Linux / Mobile OSes)
+> +  A WebApplication for Multi-platforms ( Windows / Mac / Linux / Android / IOS ) ( Not yet Started )
 
