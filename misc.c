@@ -17,10 +17,9 @@ int snd(int sockfd, void *buf, size_t len, int flags)
 	int re;
 	if ((re = send(sockfd, buf, len, MSG_NOSIGNAL | flags)) < 0)
 	{
-		buf = malloc(len * sizeof(char));
 		clt_lnk clt;
-		clt_find_local_sock(sockfd, &clt);
-		if (clt != NULL)
+		
+		if (!clt_find_local_sock(sockfd, &clt))
 			clt_disconnect(clt);
 		RESET_THREAD();
 		pthread_exit(0);
@@ -35,8 +34,7 @@ int rcv(int *sockfd, void *buf, size_t len, int flags)
 	if ((re = recv(*sockfd, buf, len, flags)) <= 0)
 	{
 		clt_lnk clt;
-		clt_find_local_sock(*sockfd, &clt);
-		if (clt != NULL)
+		if (!clt_find_local_sock(*sockfd, &clt))
 			clt_disconnect(clt);
 		RESET_THREAD();
 		pthread_exit(0);

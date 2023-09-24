@@ -26,9 +26,6 @@ int clt_accept(clt_inf **INCOMING_CLT)
     int error = 0;
     while (((CLT->sock) = accept(server_sock, (struct sockaddr *)(CLT->addr), &client_size)) < 0)
     {
-        if ((CLT->sock) < 0)
-            break;
-
         if (error < 5)
         {
             error++;
@@ -51,10 +48,11 @@ void *srvr_clt_handle(void *arg)
     epoll_del((info.SOCK), NULL);
     rcv(&(info.SOCK), GUID, 36, 0);
     GUID[36] = '\0';
-    checkerr((clt = clt_find_local_uuid(NULL_CLIENT, GUID)) == NULL ? -1 : 0, "Could Not find USER");
+    clt = clt_find_local_uuid(NULL_CLIENT, GUID);
     if (clt == NULL)
     {
         RESET_THREAD();
+        cnsle_print_err("A Thread Couldn't find a user")
         return NULL;
     }
 
@@ -112,7 +110,7 @@ int CLT_CNTRL_RCN(clt_lnk client)
     if (client->Account.state == _LOGGED)
     {
         snd(client->Client.sock, STT_ACC_ALR, 4, 0);
-        sprintf(Str, "%s\n%s", client->Account.UUID, client->Account.USRNM);
+        sprintf(Str, "%s%c%s", client->Account.UUID, UNIT_SEPARATOR, client->Account.USRNM);
         FByteSize(Str, MsgSize);
         snd(client->Client.sock, MsgSize, 5, 0);
         snd(client->Client.sock, Str, FBSizeToInt(MsgSize), 0);
@@ -212,7 +210,6 @@ int CLT_CNTRL_REGS(clt_lnk *client)
     strncpy(temp, Msg_R, 1);
     temp[1] = '\0';
     Regs_format = StringToInt(temp);
-
     if (Regs_format & W_FNAME)
     {
         Msg_R = (char *)(indx + 1);
@@ -226,6 +223,7 @@ int CLT_CNTRL_REGS(clt_lnk *client)
         temp[pos] = '\0';
         // Temp now == First Name
     }
+
     if (Regs_format & W_LNAME)
     {
         Msg_R = (char *)(indx + 1);
@@ -270,20 +268,4 @@ int CLT_CNTRL_LOGO(clt_lnk *client)
     clt->Account = inf;
     snd(clt->Client.sock, STT_CLT_SND_OK, 4, 0);
     return 0;
-}
-
-clt_inf *clt_inf_clone(clt_inf *original)
-{
-    if (original == NULL)
-        return NULL;
-
-    clt_inf *Return = malloc(sizeof(clt_inf));
-
-    Return->file = (original->file);
-    Return->sock = (original->sock);
-    Return->ID = (original->ID);
-    Return->addr = (original->addr);
-    strcpy(Return->GUID, (original->GUID));
-
-    return Return;
 }

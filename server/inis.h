@@ -7,7 +7,6 @@ typedef struct SOCK_THREAD_T
 {
     int SOCK;
     uint32_t events;
-    pthread_t *THREAD;
 } ST_T;
 
 extern int server_sock;

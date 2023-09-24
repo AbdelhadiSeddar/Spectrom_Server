@@ -19,6 +19,5 @@ extern int CLT_CNTRL_LOGO(clt_lnk *);
 extern int CLT_CNTRL_DISC(clt_lnk *);
 extern int CLT_CNTRL_RCN(clt_lnk);
 
-clt_inf *clt_inf_clone(clt_inf *original);
 
 #endif

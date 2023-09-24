@@ -33,6 +33,29 @@ clt_lnk clt_new(clt_inf *Info)
     return re;
 }
 
+clt_inf *clt_inf_clone(clt_inf *original)
+{
+    if (original == NULL)
+        return NULL;
+
+    clt_inf *Return = malloc(sizeof(clt_inf));
+
+    Return->file = (original->file);
+    Return->sock = (original->sock);
+    Return->ID = (original->ID);
+    Return->addr = (original->addr);
+    strcpy(Return->GUID, (original->GUID));
+
+    return Return;
+}
+
+void clt_update(clt_lnk Original, clt_lnk temp)
+{
+    clt_disconnect(Original);
+    Original->Client.sock = temp->Client.sock;
+    Original->Client.addr = temp->Client.addr;
+}
+
 clt_inf clt_inf_new(FILE *file, int sock, int ID, char *GUID, sa_in Addr)
 {
     clt_inf re;
@@ -43,27 +66,11 @@ clt_inf clt_inf_new(FILE *file, int sock, int ID, char *GUID, sa_in Addr)
     return re;
 }
 
-int clt_disconnect(clt_lnk clt)
-{
-    if (clt == NULL)
-        return -1;
-
-    epoll_del(clt->Client.sock, &(clt->epoll_ev));
-    close(clt->Client.sock);
-    clt->Client.sock = -1;
-    char cli[32];
-    sprintf(cli, "Client:%d", (clt->Client.ID));
-    cnsle_print(cli, "Has Disconnected");
-    clts--;
-    return 1;
-}
-
 int clt_add(clt_lnk New_Client)
 {
     ev.events = EPOLLIN | EPOLLET;
     ev.data.fd = (New_Client->Client.sock);
     New_Client->epoll_ev = ev;
-    epoll_add((New_Client->Client.sock), &ev);
     /*  Send "Accepted" Connection   */
     snd((New_Client->Client.sock), STT_CONN_ACC, 4, 0);
     /// Recive GUID
@@ -79,16 +86,37 @@ int clt_add(clt_lnk New_Client)
     if ((Old_Client = clt_find_local_uuid(NULL_CLIENT, (New_Client->Client.GUID))) != NULL)
     {
         clt_inf *Cloned;
-        (Old_Client->Client) = *(Cloned = clt_inf_clone(&(New_Client->Client)));
+        cnsle_print_err("BeforeCheck");
+        if (epoll_ctl(epollfd, EPOLL_CTL_MOD, Old_Client->Client.sock, &Old_Client->epoll_ev) != 0)
+        {
+            cnsle_print_err("AfterCheck");
+
+            switch (errno)
+            {
+            case ENOENT:
+                cnsle_print_err("ENOENT");
+                epoll_del(Old_Client->Client.sock, &Old_Client->epoll_ev);
+                snd(New_Client->Client.sock, STT_CONN_ALR, 4, 0);
+                clt_disconnect(New_Client);
+                return -1;
+
+            default:
+                break;
+            }
+        }
+        epoll_add(ev.data.fd, &ev);
+        cnsle_print_err("Wonder");
+        epoll_add((New_Client->Client.sock), &ev);
+        clt_update(Old_Client, New_Client);
         CLT_CNTRL_RCN(Old_Client);
         char own[64];
         sprintf(own, "Client:%d", (Old_Client->Client.ID));
         cnsle_print(own, "Reconnected");
         free(Cloned);
         free(New_Client);
-        return 1;
+        return 0;
     }
-
+    epoll_add(ev.data.fd, &ev);
     pthread_mutex_lock(&CURRENT_INFO_MUTEX);
     checkerr(clt_add_R(NULL_CLIENT, New_Client), "Error While adding");
 
@@ -100,8 +128,8 @@ int clt_add(clt_lnk New_Client)
     cnsle_print(own, "Logged in");
 
     CLT_LIST->next = New_Client;
-    New_Client -> prev = CLT_LIST;
-    New_Client -> next = NULL;
+    New_Client->prev = CLT_LIST;
+    New_Client->next = NULL;
     CLT_LIST = New_Client;
 
     New_Client->Account.state = _NOTLOGGED;
@@ -210,21 +238,21 @@ int clt_find_local_ClientID(int cltid, clt_lnk *Client)
         return 0;
 }
 
-int clt_find_local_sock_R(clt_lnk Tree, int sockfd, clt_lnk *Client)
+int clt_find_local_sock_R(clt_lnk Head, int sockfd, clt_lnk *Client)
 {
-    if (Tree == NULL)
+    if (Head == NULL)
         return 0;
 
-    if (Tree->Client.sock == sockfd)
+    if (Head->Client.sock == sockfd)
     {
-        *Client = Tree;
+        *Client = Head;
         return 1;
     }
     else
     {
-        if (clt_find_local_sock_R(Tree->left, sockfd, Client))
+        if (clt_find_local_sock_R(Head->left, sockfd, Client))
             return 1;
-        else if (clt_find_local_sock_R(Tree->right, sockfd, Client))
+        else if (clt_find_local_sock_R(Head->right, sockfd, Client))
             return 1;
         else
             return 0;
@@ -241,4 +269,19 @@ int clt_find_local_sock(int sockfd, clt_lnk *Client)
         return 1;
     else
         return 0;
+}
+
+int clt_disconnect(clt_lnk clt)
+{
+    if (clt == NULL || clt == NULL_CLIENT)
+        return -1;
+    if (clt->Client.sock <= -1)
+        return 1;
+    close(clt->Client.sock);
+    clt->Client.sock = -1;
+    char cli[32];
+    sprintf(cli, "Client:%d", (clt->Client.ID));
+    cnsle_print(cli, "Has Disconnected");
+    clts--;
+    return 1;
 }

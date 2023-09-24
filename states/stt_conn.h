@@ -10,6 +10,7 @@
 
 #define STT_CONN_ACC "000"  // Accepted incoming connection
 #define STT_CONN_CONF "001" // Confirm
+#define STT_CONN_ALR "002"  // Client Already Connected
 #define STT_CONN_BAN "00A"  // SEND BANNED STATUS
 #define STT_CONN_KCK "00B"  // SEND KICK STATUS
 #define STT_CONN_RCN "00C"  // RECONNECTION STATUS

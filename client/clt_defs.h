@@ -49,14 +49,6 @@ extern int INIS;
 extern clt_lnk CLT_LIST;
 extern clt_lnk NULL_CLIENT;
 
-/// @brief Disconnects from a client but allow for reconnection
-/// @return 0 => Works as intended
-int clt_disconnect(clt_lnk clt);
-
-/// @brief Disconnects & Remove from the memory
-/// @return 0 => Works as intended
-int clt_remove(clt_lnk clt);
-
 /// @brief Initialise Client List
 /// @return -1 => Error |[]| 0 => Initialized.
 extern int clt_inis();
@@ -65,6 +57,13 @@ extern int clt_inis();
 /// @param Info Pointer to Client Information (See struct client_info)
 /// @return NULL => ERROR |[]| clt_lnk => Pointer to new Client
 extern clt_lnk clt_new(clt_inf *Info);
+
+extern clt_inf *clt_inf_clone(clt_inf *original);
+
+/// @brief Updates the existing client's required info.
+/// @param Original Client's Old save pointer
+/// @param temp Client's new save pointer after reconnecting
+extern void clt_update(clt_lnk Original, clt_lnk temp);
 
 /// @brief Creates new Client Structure
 /// @param Info Client Information (See struct client_info)
@@ -87,7 +86,7 @@ extern int clt_add(clt_lnk New_Client);
 /// @return 0 => Client Added Successfully |[]| -1 => Client Already Exists
 extern int clt_add_R(clt_lnk Tree, clt_lnk NewClient);
 
-/// @brief Binary Search Tree of a Client Using GUID ( Currently being the fastest search method due to GUID being the Primary Index).
+/// @brief Binary Search Tree of a Client Using GUID.
 /// @param Tree
 /// @param GUID
 /// @return  NULL => Client Not Found. |[]| Pointer of Type [clt_lnk] returned
@@ -98,7 +97,20 @@ extern clt_lnk clt_find_local_uuid_fv(clt_lnk Tree);
 /// @param cltid CLient's id
 /// @param Client Return Not Found  |[]| 1 => Client Found
 extern int clt_find_local_ClientID(int cltid, clt_lnk *Client);
+
+/// @brief Searches for a client using their Socket
+/// @param cltid CLient's id
+/// @param Client 0 => Return Not Found  |[]| 1 => Client Found
 extern int clt_find_local_sock(int sockfd, clt_lnk *Client);
+
+/// @brief Disconnects from a client but allow for reconnection
+/// @return 0 => Works as intended
+extern int clt_disconnect(clt_lnk clt);
+
+/// @brief Disconnects & Remove from the memory
+/// @return 0 => Works as intended
+extern int clt_remove(clt_lnk clt);
+
 /*
 //Deletion Functions
 // Returns :
@@ -110,4 +122,5 @@ extern int clt_delete_runtime_fsock(int sock);
 extern int clt_delete_runtime_fuuid(const char* UUID);
 extern int clt_delete_runtime_fid(int ID);
 */
+
 #endif

@@ -100,7 +100,6 @@ re:;
                 ST_T *ST_INFO = malloc(sizeof(ST_T));
                 ST_INFO->SOCK = evs[n].data.fd;
                 ST_INFO->events = evs[n].events;
-                ST_INFO->THREAD = &CLIENT_THREAD[i];
 
                 char inf[256];
                 sprintf(inf, "Selected Thread [ %d ] for socket %d", i, ST_INFO->SOCK);
