@@ -78,7 +78,12 @@ int clt_add(clt_lnk New_Client)
     sprintf(err, "Could not Initialize Mutex for Client On Socket : %d", (New_Client->Client.sock));
     checkerr(pthread_mutex_init(&(New_Client->MUTEX), NULL), err);
     pthread_mutex_lock(&(New_Client->MUTEX));
-    snd((New_Client->Client.sock), STT_CLT_SND_GUID, 4, 0);
+    if(snd((New_Client->Client.sock), STT_CLT_SND_GUID, 4, 0) < 0)
+    {
+        close(New_Client->Client.sock);
+        free(New_Client);
+        return -1;
+    }
     rcv(&(New_Client->Client.sock), (New_Client->Client.GUID), 37, 0);
     cnsle_print_sys((New_Client->Client.GUID));
     pthread_mutex_unlock(&(New_Client->MUTEX));
@@ -86,15 +91,11 @@ int clt_add(clt_lnk New_Client)
     if ((Old_Client = clt_find_local_uuid(NULL_CLIENT, (New_Client->Client.GUID))) != NULL)
     {
         clt_inf *Cloned;
-        cnsle_print_err("BeforeCheck");
         if (epoll_ctl(epollfd, EPOLL_CTL_MOD, Old_Client->Client.sock, &Old_Client->epoll_ev) != 0)
         {
-            cnsle_print_err("AfterCheck");
-
             switch (errno)
             {
             case ENOENT:
-                cnsle_print_err("ENOENT");
                 epoll_del(Old_Client->Client.sock, &Old_Client->epoll_ev);
                 snd(New_Client->Client.sock, STT_CONN_ALR, 4, 0);
                 clt_disconnect(New_Client);
@@ -105,7 +106,6 @@ int clt_add(clt_lnk New_Client)
             }
         }
         epoll_add(ev.data.fd, &ev);
-        cnsle_print_err("Wonder");
         epoll_add((New_Client->Client.sock), &ev);
         clt_update(Old_Client, New_Client);
         CLT_CNTRL_RCN(Old_Client);
