@@ -2,7 +2,7 @@
 ### All Releases are available [here](https://github.com/SamirChelfat/Spectrom_Server/releases)
 
 # About The Project
-This is a solo project for me [@SamirChelfat](https://github.com/SamirChelfat) Which Consists of Multiple Parts,
+This is a solo project for me [@AbdelhadiSeddar](https://github.com/AbdelhadiSeddar) Which Consists of Multiple Parts,
 This project's goal is to make a Chatting System that utilizes All of Knowledges and try to improuve in them using Real Experience.
 
 ### What I am trying to improuve are the following
