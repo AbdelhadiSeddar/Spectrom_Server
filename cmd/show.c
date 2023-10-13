@@ -5,9 +5,9 @@
 
 int show_width, show_height;
 /// @brief Amount of items show in _show()
-#define _ITEMS_AMOUNT 4
+#define _SHOW_ITEMS_AMOUNT 4
 int _SHOW_ITEM_SELCT = -1;
-char *_SHOW_ITEMS[_ITEMS_AMOUNT] = {
+char *_SHOW_ITEMS[_SHOW_ITEMS_AMOUNT] = {
     "Server Info (srvrinfo)",
     "Clients List ( Lists all clients )",
     "Client Info (cltinfo) ( First valid )",
@@ -17,7 +17,7 @@ int _show()
 {
     _SHOW_ITEM_SELCT = 0;
     show_width = 52;
-    show_height = 7 + _ITEMS_AMOUNT;
+    show_height = 7 + _SHOW_ITEMS_AMOUNT;
     TARG_X = (MAX_X - show_width) / 2;
     TARG_Y = (MAX_Y - show_height) / 2;
 
@@ -32,7 +32,7 @@ int _show()
 _refresh_show_:
     wrefresh(TARGET_WIN);
     mvwprintw(TARGET_WIN, 2, 2, "Select What to show:");
-    for (int i = 0; i < _ITEMS_AMOUNT; i++)
+    for (int i = 0; i < _SHOW_ITEMS_AMOUNT; i++)
     {
         wattrset(TARGET_WIN, COLOR_PAIR(i == _SHOW_ITEM_SELCT ? _C_TEXT_WHITE_BLUE : _C_TEXT_BLACK_WHITE));
         mvwprintw(TARGET_WIN, 4 + i, 4, "%d- ", i + 1);
@@ -50,12 +50,12 @@ _refresh_show_:
             return 0;
         case KEY_U:
             if (_SHOW_ITEM_SELCT == 0)
-                _SHOW_ITEM_SELCT = _ITEMS_AMOUNT - 1;
+                _SHOW_ITEM_SELCT = _SHOW_ITEMS_AMOUNT - 1;
             else
                 _SHOW_ITEM_SELCT--;
             goto _refresh_show_;
         case KEY_D:
-            if (_SHOW_ITEM_SELCT == (_ITEMS_AMOUNT - 1))
+            if (_SHOW_ITEM_SELCT == (_SHOW_ITEMS_AMOUNT - 1))
                 _SHOW_ITEM_SELCT = 0;
             else
                 _SHOW_ITEM_SELCT++;
@@ -93,9 +93,8 @@ void cmd_show()
             _show_cltlist();
         else if (!strcmp((CMD->v_args[0]), (_HELP_CMDS[4].format[5])))
             _show_cltinfo();
-        else
-            _show();
-        return;
+        else if (alertbox(InfoTitled, "[ Error ]", "Invalid Arguments") && _show())
+            return;
     }
     else if (_show())
         return;

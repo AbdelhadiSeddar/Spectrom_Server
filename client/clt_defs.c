@@ -283,5 +283,12 @@ int clt_disconnect(clt_lnk clt)
     sprintf(cli, "Client:%d", (clt->Client.ID));
     cnsle_print(cli, "Has Disconnected");
     clts--;
-    return 1;
+    return 0;
+}
+
+int clt_logout(clt_lnk clt)
+{
+    usr_inf inf;
+    clt->Account = inf;
+    return 0;
 }

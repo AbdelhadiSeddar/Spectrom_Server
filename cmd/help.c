@@ -1,13 +1,12 @@
 #include "../_Imports.h"
 
 int height, width;
-int _n_CMDS = 0;
+int _n_CMDS = 7;
 char *re;
 __HELP_INFO *_HELP_CMDS;
 
 void _DEFINE_HELP()
 {
-    _n_CMDS = 6;
     _HELP_CMDS = calloc(_n_CMDS, sizeof(__HELP_INFO));
 
     // CLEAR
@@ -83,6 +82,23 @@ void _DEFINE_HELP()
     strcpy(_HELP_CMDS[5].aliases[0], "hide");
     strcpy(_HELP_CMDS[5].aliases[1], "nofg");
     _HELP_CMDS_f_def(5) = &__SCRN_OFF;
+
+        // Action
+    strcpy(_HELP_CMDS[6].title, "Action");
+    _HELP_CMDS[6].n_formats = 4;
+    strcpy(_HELP_CMDS[6].format[0], "");
+    strcpy(_HELP_CMDS[6].format[1], "<Client ID>");
+    strcpy(_HELP_CMDS[6].format[2], "kick <Client ID>");
+    strcpy(_HELP_CMDS[6].format[3], "logout <Client ID>");
+    strcpy(_HELP_CMDS[6].format_INFO[0], "Shows all possible actions");
+    strcpy(_HELP_CMDS[6].format_INFO[1], "Shows all possible actions on selected client");
+    strcpy(_HELP_CMDS[6].format_INFO[2], "Kicks the selected Client");
+    strcpy(_HELP_CMDS[6].format_INFO[3], "Logout the selected Client");
+    _HELP_CMDS[6].n_aliases = 3;
+    strcpy(_HELP_CMDS[6].aliases[0], "action");
+    strcpy(_HELP_CMDS[6].aliases[1], "act");
+    strcpy(_HELP_CMDS[6].aliases[2], "do");
+    _HELP_CMDS_f_def(6) = &cmd_action;
 }
 
 void getOtherAliases(__HELP_INFO INF, const char *Excluded)

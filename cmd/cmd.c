@@ -76,8 +76,8 @@ e:;
     GetCMD_s(cmd);
 cm:;
     ResolveCMD();
-    /// if (CMD != NULL) /* Show Command info for debugging*/
-    ///    ShowCMD();
+    //if (CMD != NULL) /* Show Command info for debugging*/
+    //    ShowCMD();
     free(cmd);
     if (__SCRN_STATUS)
         goto e;

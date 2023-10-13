@@ -5,6 +5,7 @@ typedef enum alertbox_t
 {
     Confirm,
     Info,
+    InfoTitled,
     HelpNotFound
 } alertbox_type;
 

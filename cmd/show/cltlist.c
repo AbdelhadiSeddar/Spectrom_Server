@@ -70,9 +70,23 @@ _change_cltlist:;
     create_win_target(show_height, show_width, CLT_LIST == NULL_CLIENT ? "[No Clients Found]" : "[ Clients List ]", BTN_OK, 0);
     _ITEM_SELCT = 0;
 _refresh_cltlist_:;
+
+    char *help = "Press [ ESC ] to Return";
+    mvprintw(MAX_Y - 1, MAX_X - strlen(help) - 1, "Press [ ");
+    wattrset(stdscr, COLOR_PAIR(_C_TEXT_RED_CYAN));
+    mvprintw(MAX_Y - 1, MAX_X - strlen(help + 8) - 1, "ESC");
+    wattrset(stdscr, COLOR_PAIR(B_BCKGRND));
+    mvprintw(MAX_Y - 1, MAX_X - strlen(help + 12) - 1, "] to Return");
     wrefresh(TARGET_WIN);
     if (clts_amount)
     {
+
+        char *action = "Press [ F12 ] to Perform Action";
+        mvprintw(MAX_Y - 2, MAX_X - strlen(action) - 1, "Press [ ");
+        wattrset(stdscr, COLOR_PAIR(_C_TEXT_GREEN_CYAN));
+        mvprintw(MAX_Y - 2, MAX_X - strlen(action + 8) - 1, "F12");
+        wattrset(stdscr, COLOR_PAIR(B_BCKGRND));
+        mvprintw(MAX_Y - 2, MAX_X - strlen(action + 12) - 1, "] to Perform Action");
         for (int i = 0; i < (show_height - 6); i++)
         {
             wattrset(TARGET_WIN, COLOR_PAIR(i == _ITEM_SELCT ? _C_TEXT_WHITE_BLUE : _C_TEXT_BLACK_WHITE));
@@ -81,70 +95,78 @@ _refresh_cltlist_:;
             else
                 mvwprintw(TARGET_WIN, 2 + i, 2, "                                                     ");
         }
+        wattrset(TARGET_WIN, COLOR_PAIR(_C_TEXT_BLACK_WHITE));
+        wrefresh(TARGET_WIN);
+        noecho();
+        if (clts_amount)
+            while (1)
+            {
+                r = getch();
+                switch (r)
+                {
+                case KEY_R:
+                case KEY_ENTR:
+                    _show_cltinfo_id(Current_Cltlist[_ITEM_SELCT]->Client.ID);
+                    delwin(TARGET_WIN);
+                    ToShow = reshow;
+                    goto _change_cltlist;
+                case KEY_U:
+                    if (_ITEM_SELCT == 0)
+                    {
+                        if (Current_Cltlist[0]->prev != NULL_CLIENT)
+                        {
+                            ToShow = prev;
+                            goto _change_cltlist;
+                        }
+                        goto _refresh_cltlist_;
+                    }
+                    else
+                    {
+                        _ITEM_SELCT--;
+                        goto _refresh_cltlist_;
+                    }
+                case KEY_D:
+                    if (_ITEM_SELCT == (clts_amount - 1))
+                    {
+                        if (Current_Cltlist[(clts_amount - 1)]->next != NULL)
+                        {
+                            ToShow = next;
+                            goto _change_cltlist;
+                        }
+                        goto _refresh_cltlist_;
+                    }
+                    else
+                    {
+                        _ITEM_SELCT++;
+                        goto _refresh_cltlist_;
+                    }
+                case KEY_ESC:
+                    if (alertbox(Confirm))
+                        return;
+                    else
+                        goto _refresh_cltlist_;
+                case KEY_F12:
+                    if (_ITEM_SELCT > 0)
+                        _action(Current_Cltlist[_ITEM_SELCT]->Client.ID);
+                    else
+                    {
+                        alertbox(InfoTitled, "Invalid", "No Client is chosen");
+                        goto _refresh_cltlist_;
+                    }
+                default:
+                    goto _refresh_cltlist_;
+                }
+            }
+        else
+            while (1)
+            {
+                r = getch();
+                if (r == KEY_ENTR)
+                    break;
+            }
     }
     else
     {
-        mvwprintw(TARGET_WIN, (show_height - 1) / 2, (show_width - strlen("Nothing To Show")) / 2, "Nothing To Show");
+        alertbox(InfoTitled, "[ Empty ]", "No Client Connected Yet");
     }
-    wattrset(TARGET_WIN, COLOR_PAIR(_C_TEXT_BLACK_WHITE));
-    wrefresh(TARGET_WIN);
-    noecho();
-    if (clts_amount)
-        while (1)
-        {
-            r = getch();
-            switch (r)
-            {
-            case KEY_R:
-            case KEY_ENTR:
-                _show_cltinfo_id(Current_Cltlist[_ITEM_SELCT]->Client.ID);
-                delwin(TARGET_WIN);
-                ToShow = reshow;
-                goto _change_cltlist;
-            case KEY_U:
-                if (_ITEM_SELCT == 0)
-                {
-                    if (Current_Cltlist[0]->prev != NULL_CLIENT)
-                    {
-                        ToShow = prev;
-                        goto _change_cltlist;
-                    }
-                    goto _refresh_cltlist_;
-                }
-                else
-                {
-                    _ITEM_SELCT--;
-                    goto _refresh_cltlist_;
-                }
-            case KEY_D:
-                if (_ITEM_SELCT == (clts_amount - 1))
-                {
-                    if (Current_Cltlist[(clts_amount - 1)]->next != NULL)
-                    {
-                        ToShow = next;
-                        goto _change_cltlist;
-                    }
-                    goto _refresh_cltlist_;
-                }
-                else
-                {
-                    _ITEM_SELCT++;
-                    goto _refresh_cltlist_;
-                }
-            case KEY_ESC:
-                if (alertbox(Confirm))
-                    return;
-                else
-                    goto _refresh_cltlist_;
-            default:
-                goto _refresh_cltlist_;
-            }
-        }
-    else
-        while (1)
-        {
-            r = getch();
-            if (r == KEY_ENTR)
-                break;
-        }
 }

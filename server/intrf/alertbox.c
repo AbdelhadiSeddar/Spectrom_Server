@@ -7,7 +7,8 @@ int alertbox(alertbox_type type, ...)
     char *Text, *Title;
     va_list va;
 
-    Title = (char *)"[ Alert ]";
+    Title = (char *)"[ Info ]";
+    va_start(va, type);
     switch (type)
     {
     case Confirm:
@@ -17,13 +18,16 @@ int alertbox(alertbox_type type, ...)
     case HelpNotFound:
         Title = (char *)"[ Help ]";
     case Info:
-        va_start(va, type);
         Text = va_arg(va, char *);
-        va_end(va);
+        break;
+    case InfoTitled:
+        Title = va_arg(va, char *);
+        Text = va_arg(va, char *);
         break;
     default:
         break;
     }
+    va_end(va);
     int alertbox_height = 6;
     int alertbox_width = strlen(Text) + (type == HelpNotFound ? 21 : 0) + 16;
     s_alertbox_w = newwin(alertbox_height, alertbox_width, ((MAX_Y - alertbox_height) / 2) + 1, ((MAX_X - alertbox_width) / 2) + 1);
@@ -73,8 +77,9 @@ int alertbox(alertbox_type type, ...)
         default:
             goto _refresh_alertbox_confirm_;
         }
-    case HelpNotFound:
     case Info:
+    case InfoTitled:
+    case HelpNotFound:
         wattron(alertbox_w, COLOR_PAIR(SLCT));
         mvwprintw(alertbox_w, alertbox_height - 2, (alertbox_width - strlen("< Ok >")) / 2, "< Ok >");
         wattroff(alertbox_w, COLOR_PAIR(SLCT));

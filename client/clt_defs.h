@@ -107,6 +107,10 @@ extern int clt_find_local_sock(int sockfd, clt_lnk *Client);
 /// @return 0 => Works as intended
 extern int clt_disconnect(clt_lnk clt);
 
+/// @brief Logsout a client from their account
+/// @return 0 => Works as intended
+extern int clt_logout(clt_lnk clt);
+
 /// @brief Disconnects & Remove from the memory
 /// @return 0 => Works as intended
 extern int clt_remove(clt_lnk clt);

@@ -27,13 +27,9 @@ int clt_accept(clt_inf **INCOMING_CLT)
     while (((CLT->sock) = accept(server_sock, (struct sockaddr *)(CLT->addr), &client_size)) < 0)
     {
         if (error < 5)
-        {
             error++;
-        }
         else
-        {
             return -1;
-        }
     }
     *INCOMING_CLT = CLT;
     return 0;
@@ -264,8 +260,8 @@ int CLT_CNTRL_LOGO(clt_lnk *client)
         return 0;
     }
 
-    usr_inf inf;
-    clt->Account = inf;
+    clt_logout(clt);
+
     snd(clt->Client.sock, STT_CLT_SND_OK, 4, 0);
     return 0;
 }

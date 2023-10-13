@@ -24,6 +24,7 @@
 #include "cmd/help.h"
 #include "cmd/cnsle.h"
 #include "cmd/show.h"
+#include "cmd/action.h"
 
 #include "server/inis.h"
 #include "server/epoll.h"
